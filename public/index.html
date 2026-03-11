@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Arthur & Brent — AI Content Bot</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+:root {
+  --white:      #FFFFFF;
+  --black:      #0A0A0A;
+  --off-white:  #F7F7F5;
+  --light-gray: #EFEFED;
+  --mid-gray:   #C8C8C4;
+  --muted:      #888884;
+  --body:       #2C2C2A;
+  --brand:      #BBE3FA;
+  --brand-dk:   #1A7FB5;
+  --brand-dp:   #0F5A82;
+  --green:      #1A9E6A;
+  --green-bg:   #E8F7F1;
+  --amber:      #C97B00;
+  --amber-bg:   #FFF4DC;
+  --red:        #C0392B;
+  --red-bg:     #FDECEB;
+  --border:     #E4E4E0;
+  --sidebar-w:  252px;
+  --font:       'Inter', -apple-system, sans-serif;
+  --r:          4px;
+  --r-md:       8px;
+  --r-lg:       12px;
+  --sh:         0 1px 4px rgba(0,0,0,0.06);
+  --sh-md:      0 2px 12px rgba(0,0,0,0.08);
+  --sh-lg:      0 8px 32px rgba(0,0,0,0.12);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;font-family:var(--font);font-size:14px;color:var(--body);background:var(--off-white);-webkit-font-smoothing:antialiased;}
+
+/* SIDEBAR */
+.sidebar{position:fixed;inset:0 auto 0 0;width:var(--sidebar-w);background:var(--black);display:flex;flex-direction:column;z-index:300;overflow-y:auto;}
+.sb-logo{padding:22px 20px 18px;border-bottom:1px solid rgba(255,255,255,0.07);flex-shrink:0;}
+.sb-logo img{height:40px;width:auto;filter:invert(1) brightness(1.8);display:block;}
+.sb-product{margin-top:9px;padding-top:9px;border-top:1px solid rgba(255,255,255,0.07);}
+.sb-product-lbl{font-size:9px;font-weight:600;letter-spacing:2.5px;text-transform:uppercase;color:var(--brand);line-height:1;}
+nav.sb-nav{flex:1;padding:6px 0;}
+.nav-sec{padding:16px 20px 4px;font-size:9.5px;font-weight:600;letter-spacing:1.8px;text-transform:uppercase;color:rgba(255,255,255,0.2);}
+.ni{display:flex;align-items:center;gap:10px;padding:8px 20px;font-size:13px;font-weight:400;color:rgba(255,255,255,0.46);cursor:pointer;transition:color .12s,background .12s;border-left:2px solid transparent;user-select:none;}
+.ni svg{width:15px;height:15px;flex-shrink:0;stroke-width:1.75;}
+.ni:hover{color:rgba(255,255,255,0.82);background:rgba(255,255,255,0.04);}
+.ni.active{color:var(--white);border-left-color:var(--brand);background:rgba(187,227,250,0.09);font-weight:500;}
+.ni.sub{padding-left:44px;font-size:12.5px;}
+.ni .nc{margin-left:auto;background:var(--brand);color:var(--black);font-size:10px;font-weight:700;border-radius:10px;padding:1px 7px;line-height:16px;}
+.nav-chev{margin-left:auto;width:13px;height:13px;stroke-width:2;color:rgba(255,255,255,0.22);transition:transform .2s;}
+.nav-chev.open{transform:rotate(90deg);}
+.nav-sub{max-height:0;overflow:hidden;transition:max-height .22s ease;}
+.nav-sub.open{max-height:300px;}
+.sb-foot{padding:13px 20px;border-top:1px solid rgba(255,255,255,0.07);font-size:11.5px;color:rgba(255,255,255,0.28);display:flex;align-items:center;gap:8px;flex-shrink:0;}
+.sd{width:6px;height:6px;border-radius:50%;background:var(--green);flex-shrink:0;box-shadow:0 0 6px rgba(26,158,106,0.5);}
+
+/* MAIN */
+.main{margin-left:var(--sidebar-w);min-height:100vh;display:flex;flex-direction:column;}
+.topbar{height:60px;padding:0 30px;background:var(--white);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;flex-shrink:0;}
+.tb-bc{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted);}
+.tb-bc svg{width:13px;height:13px;}
+.tb-bc .cur{color:var(--body);font-weight:500;}
+.tb-r{display:flex;align-items:center;gap:9px;}
+.cpill{display:flex;align-items:center;gap:8px;background:var(--off-white);border:1px solid var(--border);border-radius:20px;padding:5px 13px 5px 6px;font-size:12.5px;font-weight:500;cursor:pointer;transition:border-color .12s;}
+.cpill:hover{border-color:var(--mid-gray);}
+.cavatar{width:26px;height:26px;border-radius:50%;background:var(--brand);color:var(--black);font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;}
+.ibtn{width:34px;height:34px;border-radius:var(--r-md);border:1px solid var(--border);background:transparent;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--muted);transition:all .12s;}
+.ibtn:hover{background:var(--off-white);color:var(--body);}
+.ibtn svg{width:15px;height:15px;}
+
+/* CLIENT DROPDOWN */
+.cdrop{position:absolute;top:48px;right:0;background:var(--white);border:1px solid var(--border);border-radius:var(--r-lg);box-shadow:var(--sh-lg);min-width:220px;z-index:200;display:none;overflow:hidden;}
+.cdrop.open{display:block;animation:fi .15s ease;}
+.cdrop-lbl{font-size:10.5px;font-weight:600;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);padding:8px 14px 4px;}
+.cdrop-item{display:flex;align-items:center;gap:10px;padding:10px 14px;cursor:pointer;font-size:13px;transition:background .1s;}
+.cdrop-item:hover{background:var(--off-white);}
+.cdrop-item.active{background:#F4FAFF;font-weight:500;}
+.cdrop-div{height:1px;background:var(--border);margin:4px 0;}
+
+/* CONTENT */
+.content{padding:26px 30px;flex:1;}
+.panel{display:none;}
+.panel.active{display:block;animation:fi .18s ease;}
+@keyframes fi{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+
+/* PAGE HEADING */
+.ph{margin-bottom:22px;}
+.ph h1{font-size:21px;font-weight:600;letter-spacing:-.4px;color:var(--black);}
+.ph p{font-size:13px;color:var(--muted);margin-top:3px;}
+
+/* CARDS */
+.card{background:var(--white);border:1px solid var(--border);border-radius:var(--r-lg);padding:20px 22px;margin-bottom:14px;}
+.card-title{font-size:13.5px;font-weight:600;color:var(--black);margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+.card-title svg{width:15px;height:15px;color:var(--brand-dk);}
+
+/* STATS */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px;}
+.sc{background:var(--white);border:1px solid var(--border);border-radius:var(--r-lg);padding:17px 19px;transition:box-shadow .15s,transform .15s;}
+.sc:hover{box-shadow:var(--sh-md);transform:translateY(-1px);}
+.sc-icon{width:32px;height:32px;border-radius:var(--r-md);display:flex;align-items:center;justify-content:center;margin-bottom:11px;}
+.sc-icon svg{width:16px;height:16px;}
+.si-b{background:#EBF6FD;color:var(--brand-dk);}
+.si-g{background:var(--green-bg);color:var(--green);}
+.si-a{background:var(--amber-bg);color:var(--amber);}
+.si-k{background:var(--light-gray);color:var(--black);}
+.sv{font-size:26px;font-weight:600;letter-spacing:-.5px;color:var(--black);line-height:1;margin-bottom:3px;}
+.sl{font-size:12px;color:var(--muted);}
+
+/* HERO */
+.hero{background:var(--black);border-radius:var(--r-lg);padding:26px 30px;display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;position:relative;overflow:hidden;}
+.hero::before{content:'';position:absolute;top:-80px;right:-80px;width:280px;height:280px;background:radial-gradient(circle,rgba(187,227,250,.1) 0%,transparent 65%);border-radius:50%;pointer-events:none;}
+.hero h2{font-size:18px;font-weight:600;color:var(--white);letter-spacing:-.3px;margin-bottom:4px;}
+.hero p{font-size:12.5px;color:rgba(255,255,255,.42);}
+.hprog{margin-top:13px;display:none;min-width:240px;}
+.hprog-t{height:2px;background:rgba(255,255,255,.1);border-radius:1px;overflow:hidden;}
+.hprog-f{height:100%;background:var(--brand);width:0%;border-radius:1px;transition:width .4s;}
+.hprog-lbl{font-size:11px;color:rgba(187,227,250,.5);margin-top:5px;}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:7px;padding:8px 15px;border-radius:var(--r-md);border:none;cursor:pointer;font-family:var(--font);font-size:13px;font-weight:500;transition:all .13s;white-space:nowrap;text-decoration:none;line-height:1;}
+.btn svg{width:14px;height:14px;flex-shrink:0;}
+.bsm{padding:6px 11px;font-size:12px;}
+.bsm svg{width:13px;height:13px;}
+.b-blk{background:var(--black);color:var(--white);}
+.b-blk:hover{background:#222;}
+.b-br{background:var(--brand);color:var(--black);font-weight:600;}
+.b-br:hover{background:#a8d9f5;}
+.b-wh{background:var(--white);color:var(--body);border:1px solid var(--border);}
+.b-wh:hover{border-color:var(--mid-gray);background:var(--off-white);}
+.b-gh{background:transparent;border:1px solid var(--border);color:var(--body);}
+.b-gh:hover{border-color:var(--mid-gray);background:var(--off-white);}
+.b-dn{background:var(--red-bg);color:var(--red);border:1px solid transparent;}
+.b-dn:hover{border-color:var(--red);}
+.btn:disabled{opacity:.4;cursor:not-allowed;}
+.brow{display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
+
+/* FORMS */
+.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:13px;margin-bottom:16px;}
+.fg{display:flex;flex-direction:column;gap:5px;}
+.fg.full{grid-column:1/-1;}
+label.lbl{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;}
+input[type=text],input[type=email],input[type=password],input[type=number],input[type=url],textarea,select{border:1px solid var(--border);border-radius:var(--r-md);padding:9px 11px;font-family:var(--font);font-size:13.5px;color:var(--body);background:var(--white);transition:border-color .13s,box-shadow .13s;resize:vertical;outline:none;width:100%;}
+input:focus,textarea:focus,select:focus{border-color:var(--brand-dk);box-shadow:0 0 0 3px rgba(27,127,181,.1);}
+textarea{min-height:84px;}
+.hint{font-size:11.5px;color:var(--muted);margin-top:3px;display:flex;align-items:center;gap:5px;}
+.hint svg{width:12px;height:12px;color:var(--amber);}
+
+/* MODE TABS */
+.mtabs{display:inline-flex;gap:2px;background:var(--light-gray);border-radius:var(--r-md);padding:3px;margin-bottom:18px;}
+.mtab{display:flex;align-items:center;gap:6px;padding:7px 14px;border-radius:var(--r);font-size:12.5px;font-weight:500;cursor:pointer;border:none;background:transparent;color:var(--muted);transition:all .13s;font-family:var(--font);}
+.mtab svg{width:13px;height:13px;}
+.mtab.active{background:var(--white);color:var(--body);box-shadow:var(--sh);}
+
+/* TABLE */
+.twrap{border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;background:var(--white);}
+table{width:100%;border-collapse:collapse;font-size:13px;}
+th{background:var(--off-white);padding:9px 13px;text-align:left;font-size:10.5px;font-weight:600;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);border-bottom:1px solid var(--border);white-space:nowrap;}
+td{padding:11px 13px;border-bottom:1px solid #F0F0EC;color:var(--body);vertical-align:middle;}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:var(--off-white);}
+.tmono{font-family:'Courier New',monospace;font-size:11.5px;color:var(--muted);}
+
+/* BADGES */
+.badge{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:20px;font-size:11.5px;font-weight:500;}
+.b-gr{background:var(--green-bg);color:var(--green);}
+.b-am{background:var(--amber-bg);color:var(--amber);}
+.b-bl{background:#EBF6FD;color:var(--brand-dk);}
+.b-gy{background:var(--light-gray);color:var(--muted);}
+.b-bk{background:var(--black);color:var(--white);}
+.b-rd{background:var(--red-bg);color:var(--red);}
+
+/* SEC HDR */
+.sh{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.st{font-size:15px;font-weight:600;color:var(--black);letter-spacing:-.2px;}
+.scnt{display:inline-flex;align-items:center;justify-content:center;background:var(--light-gray);color:var(--muted);border-radius:10px;font-size:11px;font-weight:600;padding:1px 8px;margin-left:8px;}
+
+/* BULK */
+.pastebox{border:1.5px dashed var(--border);border-radius:var(--r-lg);background:var(--off-white);padding:16px 18px;transition:border-color .13s,background .13s;margin-bottom:12px;}
+.pastebox:focus-within{border-color:var(--brand-dk);background:#F4FAFF;}
+.pastebox textarea{border:none;background:transparent;min-height:100px;font-family:'Courier New',monospace;font-size:12.5px;padding:0;box-shadow:none;}
+.pastebox textarea:focus{box-shadow:none;border:none;}
+.btwrap{border:1px solid var(--border);border-radius:var(--r-lg);overflow:auto;max-height:460px;background:var(--white);}
+.btbl{width:100%;border-collapse:collapse;font-size:12.5px;min-width:940px;}
+.btbl thead{position:sticky;top:0;z-index:5;}
+.btbl th{background:var(--off-white);font-size:10px;padding:8px 9px;}
+.btbl td{padding:2px 3px;border-bottom:1px solid #F0F0EC;}
+.btbl tr.sel td{background:#F4FAFF;}
+.cin{border:none;background:transparent;width:100%;padding:6px 8px;font-family:var(--font);font-size:12.5px;color:var(--body);border-radius:var(--r);outline:none;transition:background .1s,box-shadow .1s;}
+.cin:focus{background:var(--white);box-shadow:0 0 0 2px var(--brand-dk);}
+.csel{border:none;background:transparent;width:100%;padding:6px 4px;font-family:var(--font);font-size:12.5px;color:var(--body);border-radius:var(--r);cursor:pointer;outline:none;}
+.csel:focus{background:var(--white);box-shadow:0 0 0 2px var(--brand-dk);}
+.dbtn{background:none;border:none;cursor:pointer;color:var(--mid-gray);padding:5px 6px;border-radius:var(--r);transition:all .12s;display:flex;align-items:center;}
+.dbtn:hover{color:var(--red);background:var(--red-bg);}
+.dbtn svg{width:13px;height:13px;}
+.tcb{width:36px;text-align:center;} .tnum{width:32px;text-align:center;color:var(--mid-gray);font-size:11px;}
+.tu{min-width:195px;max-width:230px;} .tn{min-width:135px;} .tk{min-width:135px;} .tk2{min-width:155px;} .tty{min-width:125px;} .tto{min-width:115px;} .tc{min-width:175px;} .tdl{width:34px;text-align:center;}
+.fbar{background:var(--off-white);border:1px solid var(--border);border-radius:var(--r-lg);padding:11px 14px;margin-bottom:11px;display:flex;flex-wrap:wrap;gap:9px;align-items:flex-end;}
+.fbar .fg{min-width:125px;flex:1;margin:0;}
+.fbar .lbl{font-size:10px;}
+.fbar-lbl{font-size:10.5px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;white-space:nowrap;align-self:center;}
+.abtn{background:var(--black);color:var(--white);border:none;border-radius:var(--r-md);padding:8px 13px;font-family:var(--font);font-size:12.5px;font-weight:500;cursor:pointer;white-space:nowrap;align-self:flex-end;transition:background .13s;display:flex;align-items:center;gap:6px;}
+.abtn:hover{background:#222;}
+.abtn svg{width:13px;height:13px;}
+
+/* EMPTY */
+.empty{text-align:center;padding:50px 20px;color:var(--muted);}
+.empty svg{width:34px;height:34px;margin:0 auto 13px;color:var(--mid-gray);display:block;}
+.empty h3{font-size:15px;font-weight:600;color:var(--body);margin-bottom:4px;letter-spacing:-.2px;}
+.empty p{font-size:13px;}
+
+/* DIVIDER */
+.div{height:1px;background:var(--border);margin:18px 0;}
+
+/* API CARD */
+.apic{background:var(--white);border:1px solid var(--border);border-radius:var(--r-lg);padding:15px 18px;margin-bottom:10px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
+.apic-logo{width:38px;height:38px;border-radius:var(--r-md);background:var(--off-white);display:flex;align-items:center;justify-content:center;font-size:19px;flex-shrink:0;border:1px solid var(--border);}
+.apic-info{flex:1;min-width:0;}
+.apic-name{font-weight:600;font-size:13.5px;margin-bottom:2px;color:var(--black);}
+.apic-desc{font-size:12px;color:var(--muted);}
+.apic-r{display:flex;align-items:center;gap:9px;flex-wrap:wrap;}
+.apiw{display:flex;gap:6px;align-items:center;}
+.apiw input{width:240px;font-family:monospace;font-size:12.5px;}
+.ast{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:500;padding:3px 10px;border-radius:20px;white-space:nowrap;}
+.st-on{background:var(--green-bg);color:var(--green);}
+.st-off{background:var(--light-gray);color:var(--muted);}
+
+/* LICENCE */
+.licc{background:var(--black);border-radius:var(--r-lg);padding:26px 30px;color:var(--white);position:relative;overflow:hidden;margin-bottom:14px;}
+.licc::before{content:'';position:absolute;top:-60px;right:-60px;width:240px;height:240px;background:radial-gradient(circle,rgba(187,227,250,.08) 0%,transparent 65%);border-radius:50%;pointer-events:none;}
+.lic-badge{display:inline-flex;align-items:center;gap:6px;background:var(--brand);color:var(--black);font-size:10.5px;font-weight:700;padding:4px 12px;border-radius:20px;margin-bottom:13px;letter-spacing:.5px;}
+.lic-badge svg{width:11px;height:11px;}
+.lic-name{font-size:20px;font-weight:600;letter-spacing:-.4px;margin-bottom:4px;}
+.lic-sub{font-size:12.5px;color:rgba(255,255,255,.38);}
+.lic-meta{display:flex;flex-wrap:wrap;gap:18px;margin-top:16px;font-size:12.5px;color:rgba(187,227,250,.58);}
+.lic-meta-item{display:flex;align-items:center;gap:7px;}
+.lic-meta-item svg{width:13px;height:13px;}
+
+/* OWNER GATE */
+.ogate{position:relative;border:1.5px dashed var(--border);border-radius:var(--r-lg);padding:20px;margin-bottom:14px;}
+.obadge{position:absolute;top:-11px;left:14px;background:var(--black);color:var(--brand);font-size:10px;font-weight:600;padding:2px 10px;border-radius:10px;display:flex;align-items:center;gap:5px;letter-spacing:.3px;}
+.obadge svg{width:11px;height:11px;}
+
+/* USER MANAGEMENT */
+.uavatar{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;flex-shrink:0;}
+.av-b{background:#EBF6FD;color:var(--brand-dk);}
+.av-g{background:var(--green-bg);color:var(--green);}
+.av-a{background:var(--amber-bg);color:var(--amber);}
+.av-gr{background:var(--light-gray);color:var(--muted);}
+.role{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;font-size:11.5px;font-weight:500;border:1px solid transparent;}
+.r-own{background:var(--black);color:var(--white);}
+.r-adm{background:#EBF6FD;color:var(--brand-dk);border-color:#C4E6F8;}
+.r-mem{background:var(--light-gray);color:var(--muted);}
+.r-vw{background:var(--off-white);color:var(--muted);border-color:var(--border);}
+
+/* MODAL */
+.moverlay{position:fixed;inset:0;background:rgba(0,0,0,.42);z-index:500;display:none;align-items:center;justify-content:center;animation:fi .15s ease;}
+.moverlay.open{display:flex;}
+.modal{background:var(--white);border-radius:var(--r-lg);padding:26px 26px 22px;width:430px;box-shadow:var(--sh-lg);animation:su .2s ease;}
+@keyframes su{from{transform:translateY(14px);opacity:0}to{transform:translateY(0);opacity:1}}
+.modal-title{font-size:16px;font-weight:600;color:var(--black);letter-spacing:-.3px;margin-bottom:4px;}
+.modal-sub{font-size:13px;color:var(--muted);margin-bottom:18px;}
+.modal-foot{display:flex;justify-content:flex-end;gap:8px;margin-top:18px;padding-top:16px;border-top:1px solid var(--border);}
+
+/* TOAST */
+.toast{position:fixed;bottom:22px;right:22px;background:var(--black);color:var(--white);padding:11px 17px;border-radius:var(--r-lg);font-size:13px;font-weight:500;display:none;align-items:center;gap:10px;z-index:9999;box-shadow:var(--sh-lg);max-width:350px;animation:ti .2s ease;}
+.toast.show{display:flex;}
+.t-ok{border-left:3px solid var(--green);}
+.t-err{border-left:3px solid var(--red);}
+.t-info{border-left:3px solid var(--brand-dk);}
+@keyframes ti{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.spin{width:14px;height:14px;border:2px solid rgba(255,255,255,.2);border-top-color:var(--white);border-radius:50%;animation:r .7s linear infinite;flex-shrink:0;}
+@keyframes r{to{transform:rotate(360deg)}}
+::-webkit-scrollbar{width:5px;height:5px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sb-logo">
+    <img src="/logo.png" alt="Arthur & Brent">
+    <div class="sb-product">
+      <div class="sb-product-lbl">AI Content Bot</div>
+    </div>
+  </div>
+  <nav class="sb-nav">
+    <div class="ni active" onclick="go(this,'dashboard')"><svg data-lucide="layout-dashboard"></svg> Dashboard</div>
+    <div class="nav-sec">Content</div>
+    <div class="ni" onclick="toggleG('g-cb',this)"><svg data-lucide="bot"></svg> Content Bot <svg class="nav-chev open" data-lucide="chevron-right" id="chev-g-cb"></svg></div>
+    <div class="nav-sub open" id="g-cb">
+      <div class="ni sub" onclick="go(this,'plp')"><svg data-lucide="layers"></svg> PLP <span class="nc" id="nc-wl">0</span></div>
+    </div>
+    <div class="ni" onclick="go(this,'content-data')"><svg data-lucide="database"></svg> Content Data</div>
+    <div class="nav-sec">SEO</div>
+    <div class="ni" onclick="toggleG('g-mb',this)"><svg data-lucide="search"></svg> Meta Bot <svg class="nav-chev" data-lucide="chevron-right" id="chev-g-mb"></svg></div>
+    <div class="nav-sub" id="g-mb">
+      <div class="ni sub" onclick="go(this,'meta-writer')"><svg data-lucide="pen-line"></svg> Writer</div>
+      <div class="ni sub" onclick="go(this,'meta-checker')"><svg data-lucide="shield-check"></svg> Checker</div>
+    </div>
+    <div class="ni" onclick="go(this,'meta-data')"><svg data-lucide="table-2"></svg> Meta Data</div>
+    <div class="nav-sec">Beheer</div>
+    <div class="ni" onclick="go(this,'users')"><svg data-lucide="users"></svg> Gebruikers</div>
+    <div class="ni" onclick="toggleG('g-set',this)"><svg data-lucide="settings"></svg> Instellingen <svg class="nav-chev" data-lucide="chevron-right" id="chev-g-set"></svg></div>
+    <div class="nav-sub" id="g-set">
+      <div class="ni sub" onclick="go(this,'set-client')"><svg data-lucide="building-2"></svg> Klantinstellingen</div>
+      <div class="ni sub" onclick="go(this,'set-api')"><svg data-lucide="key"></svg> API Settings</div>
+      <div class="ni sub" onclick="go(this,'set-wh')"><svg data-lucide="webhook"></svg> Webhooks</div>
+      <div class="ni sub" onclick="go(this,'set-lic')"><svg data-lucide="badge-check"></svg> Licentie</div>
+    </div>
+  </nav>
+  <div class="sb-foot"><div class="sd"></div> n8n verbonden</div>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+  <header class="topbar">
+    <div class="tb-bc">
+      <span>AI Content Bot</span>
+      <svg data-lucide="chevron-right"></svg>
+      <span class="cur" id="crumb">Dashboard</span>
+    </div>
+    <div class="tb-r">
+      <button class="ibtn"><svg data-lucide="bell"></svg></button>
+      <div style="position:relative;">
+        <div class="cpill" onclick="toggleDrop()">
+          <div class="cavatar" id="ca">BN</div>
+          <span id="cn">Bosta NL</span>
+          <svg data-lucide="chevrons-up-down" style="width:12px;height:12px;color:var(--muted);margin-left:2px;"></svg>
+        </div>
+        <div class="cdrop" id="cdrop">
+          <div class="cdrop-lbl">Klanten</div>
+          <div class="cdrop-item active" onclick="swClient('Bosta NL','BN',this)">
+            <div style="width:24px;height:24px;font-size:9px;background:var(--brand);color:var(--black);border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;">BN</div>
+            Bosta NL <svg data-lucide="check" style="margin-left:auto;width:14px;height:14px;" class="cc"></svg>
+          </div>
+          <div class="cdrop-item" onclick="swClient('Norlandia','NO',this)">
+            <div style="width:24px;height:24px;font-size:9px;background:var(--green-bg);color:var(--green);border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;">NO</div>
+            Norlandia
+          </div>
+          <div class="cdrop-div"></div>
+          <div class="cdrop-item" onclick="go(null,'set-client')">
+            <svg data-lucide="plus" style="width:14px;height:14px;color:var(--muted);"></svg>
+            <span style="color:var(--muted);">Klant toevoegen</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="content">
+
+    <!-- DASHBOARD -->
+    <div id="panel-dashboard" class="panel active">
+      <div class="ph"><h1>Dashboard</h1><p>Overzicht van je AI Content Bot activiteit</p></div>
+      <div class="stats">
+        <div class="sc"><div class="sc-icon si-b"><svg data-lucide="list-checks"></svg></div><div class="sv" id="s-tot">0</div><div class="sl">Totaal aanvragen</div></div>
+        <div class="sc"><div class="sc-icon si-g"><svg data-lucide="circle-check-big"></svg></div><div class="sv" id="s-done">0</div><div class="sl">Afgerond</div></div>
+        <div class="sc"><div class="sc-icon si-a"><svg data-lucide="hourglass"></svg></div><div class="sv" id="s-pend">0</div><div class="sl">In behandeling</div></div>
+        <div class="sc"><div class="sc-icon si-k"><svg data-lucide="file-text"></svg></div><div class="sv" id="s-pgs">0</div><div class="sl">Pagina's aangemaakt</div></div>
+      </div>
+      <div class="hero">
+        <div>
+          <h2>Start de Content Bot</h2>
+          <p>Vul de PLP wishlist in en genereer SEO-content met één klik.</p>
+          <div class="hprog" id="hprog"><div class="hprog-t"><div class="hprog-f" id="hfill"></div></div><div class="hprog-lbl" id="hlbl">Verbinding maken…</div></div>
+        </div>
+        <button class="btn b-br" style="font-size:14px;padding:11px 22px;" id="main-run" onclick="runBot()"><svg data-lucide="zap"></svg> SEO Content genereren</button>
+      </div>
+      <div class="card"><div class="card-title"><svg data-lucide="info"></svg> Hulp nodig?</div><p style="font-size:13.5px;color:var(--muted);line-height:1.7;">Vragen? Neem contact op via <a href="mailto:lars@arthurbrent.nl" style="color:var(--brand-dk);font-weight:500;">lars@arthurbrent.nl</a>.</p></div>
+    </div>
+
+    <!-- PLP -->
+    <div id="panel-plp" class="panel">
+      <div class="ph"><h1>Content Bot — PLP</h1><p>Beheer en verwerk je SEO content aanvragen</p></div>
+      <div class="mtabs">
+        <button class="mtab active" id="tab-s" onclick="setMode('s')"><svg data-lucide="pen"></svg> Enkelvoudig</button>
+        <button class="mtab" id="tab-b" onclick="setMode('b')"><svg data-lucide="zap"></svg> Bulk import</button>
+      </div>
+
+      <div id="ms">
+        <div class="card">
+          <div class="card-title"><svg data-lucide="plus-circle"></svg> Nieuwe Content Aanvraag</div>
+          <div class="fgrid">
+            <div class="fg"><label class="lbl">Paginanaam *</label><input type="text" id="fp" placeholder="bijv. Categoriepagina Sneakers"></div>
+            <div class="fg"><label class="lbl">URL / Slug</label><input type="text" id="fsl" placeholder="/nl/schoenen/sneakers"></div>
+            <div class="fg"><label class="lbl">Primaire zoekterm *</label><input type="text" id="fk1" placeholder="bijv. sneakers kopen"></div>
+            <div class="fg"><label class="lbl">Secundaire zoektermen</label><input type="text" id="fk2" placeholder="hardloopschoenen, …"></div>
+            <div class="fg full"><label class="lbl">Doelgroep / Persona</label><input type="text" id="fpe" placeholder="bijv. sportief publiek, 25-40 jaar"></div>
+            <div class="fg"><label class="lbl">Contenttype</label><select id="fty"><option value="">— Selecteer type —</option><option value="categorie">Categoriepagina</option><option value="product">Productpagina</option><option value="blog">Blogartikel</option><option value="landing">Landingspagina</option><option value="home">Homepage</option></select></div>
+            <div class="fg"><label class="lbl">Tone of Voice</label><select id="ftn"><option value="professioneel">Professioneel</option><option value="vriendelijk">Vriendelijk &amp; informeel</option><option value="inspirerend">Inspirerend</option><option value="zakelijk">Zakelijk</option></select></div>
+            <div class="fg full"><label class="lbl">Extra context / briefing</label><textarea id="fct" placeholder="USP's, concurrenten, speciale aanbiedingen…"></textarea><span class="hint"><svg data-lucide="lightbulb"></svg> Meer context = betere output</span></div>
+            <div class="fg full"><label class="lbl">Bestaande content (optioneel)</label><textarea id="fex" placeholder="Bestaande tekst om te verbeteren…" style="min-height:68px;"></textarea></div>
+          </div>
+          <div class="brow"><button class="btn b-blk" onclick="addS()"><svg data-lucide="plus"></svg> Toevoegen aan lijst</button><button class="btn b-gh" onclick="clrS()">Leegmaken</button></div>
+        </div>
+      </div>
+
+      <div id="mb" style="display:none;">
+        <div class="card" id="bs1">
+          <div class="card-title"><svg data-lucide="clipboard-paste"></svg> URL's plakken</div>
+          <div class="pastebox"><textarea id="bi" placeholder="Plak hier je URL's — één per regel:&#10;&#10;https://bosta.nl/categorie/sneakers&#10;https://bosta.nl/categorie/hardloopschoenen&#10;…"></textarea></div>
+          <div class="brow"><button class="btn b-blk" onclick="pBulk()"><svg data-lucide="arrow-right"></svg> Importeren &amp; bewerken</button><span id="uc" style="font-size:12.5px;color:var(--muted);"></span></div>
+        </div>
+        <div id="bs2" style="display:none;">
+          <div class="sh" style="margin-bottom:10px;">
+            <div class="st">Bewerk per URL <span class="scnt" id="bcnt">0</span></div>
+            <div class="brow">
+              <button class="btn b-gh bsm" onclick="rBulk()"><svg data-lucide="arrow-left"></svg> Nieuwe import</button>
+              <button class="btn b-gh bsm" onclick="addBR()"><svg data-lucide="plus"></svg> Rij toevoegen</button>
+              <button class="btn b-blk" onclick="b2list()"><svg data-lucide="check"></svg> Alles naar lijst</button>
+            </div>
+          </div>
+          <div class="fbar">
+            <div class="fbar-lbl">Toepassen op selectie:</div>
+            <div class="fg"><label class="lbl">Type</label><select id="flt"><option value="">— ongewijzigd —</option><option value="categorie">Categoriepagina</option><option value="product">Productpagina</option><option value="blog">Blogartikel</option><option value="landing">Landingspagina</option></select></div>
+            <div class="fg"><label class="lbl">Tone</label><select id="fln"><option value="">— ongewijzigd —</option><option value="professioneel">Professioneel</option><option value="vriendelijk">Vriendelijk</option><option value="inspirerend">Inspirerend</option><option value="zakelijk">Zakelijk</option></select></div>
+            <div class="fg" style="min-width:160px;"><label class="lbl">Primaire zoekterm</label><input type="text" id="flk" placeholder="voor alle geselecteerden"></div>
+            <div class="fg" style="min-width:160px;"><label class="lbl">Context</label><input type="text" id="flc" placeholder="toevoegen aan context"></div>
+            <button class="abtn" onclick="applyF()"><svg data-lucide="arrow-down-to-line"></svg> Toepassen</button>
+          </div>
+          <div class="btwrap" id="btbl"></div>
+          <div style="margin-top:9px;display:flex;align-items:center;gap:13px;">
+            <label style="display:flex;align-items:center;gap:7px;cursor:pointer;font-size:12.5px;color:var(--muted);font-weight:400;">
+              <input type="checkbox" id="sall" onchange="selAll(this)" style="accent-color:var(--brand-dk);width:14px;height:14px;"> Alles selecteren
+            </label>
+            <span id="sinfo" style="font-size:12px;color:var(--muted);"></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="sh" style="margin-top:26px;">
+        <div class="st">Wishlist <span class="scnt" id="wlcnt">0</span></div>
+        <button class="btn b-blk" id="runbtn" onclick="runBot()" disabled><svg data-lucide="zap"></svg> Verwerken</button>
+      </div>
+      <div class="twrap" id="wlt">
+        <div class="empty"><svg data-lucide="clipboard-list"></svg><h3>Wishlist is leeg</h3><p>Voeg een aanvraag toe via Enkelvoudig of Bulk import.</p></div>
+      </div>
+    </div>
+
+    <!-- CONTENT DATA -->
+    <div id="panel-content-data" class="panel">
+      <div class="ph"><h1>Content Data</h1><p>Overzicht van gegenereerde SEO content</p></div>
+      <div class="sh">
+        <div class="mtabs" style="margin-bottom:0;"><button class="mtab active" onclick="fCD('all',this)">Alles</button><button class="mtab" onclick="fCD('done',this)">Afgerond</button><button class="mtab" onclick="fCD('pend',this)">Wachtend</button></div>
+        <button class="btn b-gh" onclick="doExp()"><svg data-lucide="download"></svg> CSV exporteren</button>
+      </div>
+      <div class="twrap" id="cdt"><div class="empty"><svg data-lucide="bot"></svg><h3>Nog geen content gegenereerd</h3><p>Start de bot via Dashboard of PLP wishlist.</p></div></div>
+    </div>
+
+    <!-- META WRITER -->
+    <div id="panel-meta-writer" class="panel">
+      <div class="ph"><h1>Meta Bot — Writer</h1><p>Genereer meta titles en descriptions in bulk</p></div>
+      <div class="card"><div class="card-title"><svg data-lucide="pen-line"></svg> URL's invoeren</div><div class="pastebox" style="margin-bottom:12px;"><textarea placeholder="Plak URL's — één per regel…" style="min-height:96px;"></textarea></div><div class="fgrid" style="margin-bottom:14px;"><div class="fg"><label class="lbl">Taal</label><select><option>Nederlands</option><option>Engels</option><option>Duits</option></select></div><div class="fg"><label class="lbl">Max. title lengte</label><input type="number" value="60"></div></div><button class="btn b-blk"><svg data-lucide="zap"></svg> Meta genereren</button></div>
+    </div>
+
+    <!-- META CHECKER -->
+    <div id="panel-meta-checker" class="panel">
+      <div class="ph"><h1>Meta Bot — Checker</h1><p>Controleer bestaande meta data op kwaliteit en lengte</p></div>
+      <div class="card"><div class="card-title"><svg data-lucide="shield-check"></svg> Meta data analyseren</div><div class="pastebox" style="margin-bottom:12px;"><textarea placeholder="Plak URL's of meta data om te analyseren…" style="min-height:96px;"></textarea></div><button class="btn b-blk"><svg data-lucide="search"></svg> Analyseren</button></div>
+    </div>
+
+    <!-- META DATA -->
+    <div id="panel-meta-data" class="panel">
+      <div class="ph"><h1>Meta Data</h1><p>Overzicht van gegenereerde meta data</p></div>
+      <div class="sh"><div></div><button class="btn b-gh"><svg data-lucide="download"></svg> CSV exporteren</button></div>
+      <div class="twrap"><div class="empty"><svg data-lucide="table-2"></svg><h3>Geen meta data beschikbaar</h3><p>Start een Meta Writer run om resultaten te zien.</p></div></div>
+    </div>
+
+    <!-- USERS -->
+    <div id="panel-users" class="panel">
+      <div class="sh" style="margin-bottom:20px;">
+        <div class="ph" style="margin-bottom:0;"><h1>Gebruikersbeheer</h1><p>Beheer toegang en rollen voor <span id="um-client">Bosta NL</span></p></div>
+        <button class="btn b-blk" onclick="openM()"><svg data-lucide="user-plus"></svg> Gebruiker uitnodigen</button>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:18px;">
+        <div class="card" style="padding:13px 15px;margin-bottom:0;"><div style="margin-bottom:6px;"><span class="role r-own">Owner</span></div><p style="font-size:12px;color:var(--muted);line-height:1.5;">Volledige toegang incl. webhooks, licentie en gebruikersbeheer.</p></div>
+        <div class="card" style="padding:13px 15px;margin-bottom:0;"><div style="margin-bottom:6px;"><span class="role r-adm">Admin</span></div><p style="font-size:12px;color:var(--muted);line-height:1.5;">Toegang tot alle content- en meta-functies. Geen webhook/licentie.</p></div>
+        <div class="card" style="padding:13px 15px;margin-bottom:0;"><div style="margin-bottom:6px;"><span class="role r-mem">Member</span></div><p style="font-size:12px;color:var(--muted);line-height:1.5;">Kan aanvragen aanmaken en de bot starten. Geen instellingen.</p></div>
+        <div class="card" style="padding:13px 15px;margin-bottom:0;"><div style="margin-bottom:6px;"><span class="role r-vw">Viewer</span></div><p style="font-size:12px;color:var(--muted);line-height:1.5;">Alleen lezen. Kan geen aanvragen aanmaken of bot starten.</p></div>
+      </div>
+      <div class="twrap"><table><thead><tr><th>Gebruiker</th><th>Rol</th><th>Toegevoegd</th><th>Laatste login</th><th>Status</th><th></th></tr></thead><tbody id="utbody"></tbody></table></div>
+      <div class="sh" style="margin-top:22px;"><div class="st">Openstaande uitnodigingen <span class="scnt">2</span></div></div>
+      <div class="twrap"><table><thead><tr><th>E-mailadres</th><th>Rol</th><th>Uitgenodigd op</th><th>Verloopt</th><th></th></tr></thead><tbody>
+        <tr><td>sarah.de.vries@bosta.nl</td><td><span class="role r-mem">Member</span></td><td class="tmono">8 mrt 2026</td><td class="tmono">15 mrt 2026</td><td><div class="brow"><button class="btn b-gh bsm"><svg data-lucide="refresh-cw"></svg> Opnieuw</button><button class="btn b-dn bsm"><svg data-lucide="x"></svg></button></div></td></tr>
+        <tr><td>m.janssen@bosta.nl</td><td><span class="role r-vw">Viewer</span></td><td class="tmono">10 mrt 2026</td><td class="tmono">17 mrt 2026</td><td><div class="brow"><button class="btn b-gh bsm"><svg data-lucide="refresh-cw"></svg> Opnieuw</button><button class="btn b-dn bsm"><svg data-lucide="x"></svg></button></div></td></tr>
+      </tbody></table></div>
+    </div>
+
+    <!-- SET CLIENT -->
+    <div id="panel-set-client" class="panel">
+      <div class="ph"><h1>Klantinstellingen</h1></div>
+      <div class="card"><div class="card-title"><svg data-lucide="building-2"></svg> Klantgegevens</div>
+        <div class="fgrid"><div class="fg"><label class="lbl">Klantnaam</label><input type="text" value="Bosta NL"></div><div class="fg"><label class="lbl">Website</label><input type="url" value="https://bosta.nl"></div><div class="fg"><label class="lbl">Standaard taal</label><select><option>Nederlands</option><option>Engels</option><option>Duits</option></select></div><div class="fg"><label class="lbl">Tone of Voice</label><select><option>Professioneel</option><option>Vriendelijk</option></select></div><div class="fg full"><label class="lbl">Merkbeschrijving</label><textarea placeholder="Doelgroep, positionering, USP's…"></textarea></div></div>
+        <button class="btn b-blk"><svg data-lucide="save"></svg> Opslaan</button>
+      </div>
+    </div>
+
+    <!-- SET API -->
+    <div id="panel-set-api" class="panel">
+      <div class="ph"><h1>API Settings</h1><p>Voer je API keys in voor externe diensten</p></div>
+      <div class="card"><div class="card-title"><svg data-lucide="key"></svg> API Keys</div><p style="font-size:13px;color:var(--muted);margin-bottom:18px;">Je keys worden versleuteld opgeslagen en nooit gedeeld.</p>
+        <div class="apic"><div class="apic-logo">🤖</div><div class="apic-info"><div class="apic-name">OpenAI</div><div class="apic-desc">GPT-4o voor content generatie</div></div><div class="apic-r"><div class="apiw"><input type="password" placeholder="sk-proj-…" id="k-oa"><button class="btn b-gh bsm" onclick="tv('k-oa',this)"><svg data-lucide="eye"></svg></button><button class="btn b-blk bsm" onclick="sKey('openai')"><svg data-lucide="save"></svg></button></div><span class="ast st-off" id="st-oa"><svg data-lucide="circle" style="width:8px;height:8px;"></svg> Niet ingesteld</span></div></div>
+        <div class="apic"><div class="apic-logo">🔥</div><div class="apic-info"><div class="apic-name">Firecrawl</div><div class="apic-desc">Web scraping voor content analyse</div></div><div class="apic-r"><div class="apiw"><input type="password" placeholder="fc-…" id="k-fc"><button class="btn b-gh bsm" onclick="tv('k-fc',this)"><svg data-lucide="eye"></svg></button><button class="btn b-blk bsm" onclick="sKey('firecrawl')"><svg data-lucide="save"></svg></button></div><span class="ast st-off" id="st-fc"><svg data-lucide="circle" style="width:8px;height:8px;"></svg> Niet ingesteld</span></div></div>
+        <div class="apic"><div class="apic-logo">📊</div><div class="apic-info"><div class="apic-name">DataForSEO</div><div class="apic-desc">Zoekvolume &amp; SERP data</div></div><div class="apic-r"><div class="apiw"><input type="password" placeholder="login:password" id="k-ds"><button class="btn b-gh bsm" onclick="tv('k-ds',this)"><svg data-lucide="eye"></svg></button><button class="btn b-blk bsm" onclick="sKey('dataforseo')"><svg data-lucide="save"></svg></button></div><span class="ast st-off" id="st-ds"><svg data-lucide="circle" style="width:8px;height:8px;"></svg> Niet ingesteld</span></div></div>
+      </div>
+    </div>
+
+    <!-- SET WEBHOOK -->
+    <div id="panel-set-wh" class="panel">
+      <div class="ph"><h1>Webhook Configuratie</h1><p>n8n koppeling</p></div>
+      <div class="ogate"><div class="obadge"><svg data-lucide="lock"></svg> Alleen productowner</div>
+        <div class="fgrid" style="margin-top:10px;"><div class="fg full"><label class="lbl">SEO Content Webhook URL</label><input type="url" id="whs" placeholder="https://your-n8n.com/webhook/seo-content"></div><div class="fg full"><label class="lbl">Meta Bulk Webhook URL</label><input type="url" id="whm" placeholder="https://your-n8n.com/webhook/meta-bulk"></div></div>
+        <button class="btn b-blk" onclick="sWH()"><svg data-lucide="save"></svg> Opslaan</button>
+      </div>
+    </div>
+
+    <!-- SET LICENCE -->
+    <div id="panel-set-lic" class="panel">
+      <div class="ph"><h1>Licentie</h1></div>
+      <div class="licc"><div class="lic-badge"><svg data-lucide="shield-check"></svg> ACTIEF</div><div class="lic-name">AI Content Bot — Pro</div><div class="lic-sub">Uitgegeven door Arthur &amp; Brent</div><div class="lic-meta"><div class="lic-meta-item"><svg data-lucide="building-2"></svg> Bosta NL</div><div class="lic-meta-item"><svg data-lucide="calendar"></svg> Geldig t/m 31 dec 2026</div><div class="lic-meta-item"><svg data-lucide="users"></svg> 5 gebruikers</div><div class="lic-meta-item"><svg data-lucide="infinity"></svg> Onbeperkte runs</div></div></div>
+      <div class="card"><div class="card-title"><svg data-lucide="badge-check"></svg> Licentiegegevens</div><div class="fgrid"><div class="fg"><label class="lbl">Licentiesleutel</label><input type="password" value="AB-PRO-XXXX-XXXX-XXXX" id="lk"></div><div class="fg"><label class="lbl">Gekoppeld aan</label><input type="text" value="bosta.nl" readonly style="background:var(--off-white);color:var(--muted);"></div></div><div class="brow"><button class="btn b-gh" onclick="tv('lk',this)"><svg data-lucide="eye"></svg> Toon sleutel</button><button class="btn b-blk"><svg data-lucide="refresh-cw"></svg> Verlengen</button></div></div>
+    </div>
+
+  </div>
+</main>
+
+<!-- INVITE MODAL -->
+<div class="moverlay" id="moverlay" onclick="if(event.target===this)closeM()">
+  <div class="modal">
+    <div class="modal-title">Gebruiker uitnodigen</div>
+    <div class="modal-sub">Stuur een uitnodiging naar een nieuw teamlid.</div>
+    <div class="fg" style="margin-bottom:11px;"><label class="lbl">E-mailadres</label><input type="email" id="inv-e" placeholder="naam@bedrijf.nl"></div>
+    <div class="fg"><label class="lbl">Rol</label><select id="inv-r"><option value="admin">Admin — volledige toegang</option><option value="member" selected>Member — content aanmaken &amp; verwerken</option><option value="viewer">Viewer — alleen lezen</option></select></div>
+    <div class="modal-foot"><button class="btn b-gh" onclick="closeM()">Annuleren</button><button class="btn b-blk" onclick="sInvite()"><svg data-lucide="send"></svg> Uitnodiging sturen</button></div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"><div class="spin" id="tsp" style="display:none;"></div><span id="tmsg"></span></div>
+
+<script>
+lucide.createIcons();
+let wl=[],cd=[],br=[];
+let wh={seo:'',meta:''};
+let cdf='all';
+const users=[
+  {name:'Lars Wonnink',email:'lars@arthurbrent.nl',role:'owner',ini:'LW',av:'av-b',added:'1 jan 2026',login:'Vandaag',active:true},
+  {name:'Alex de Boer',email:'alex@bosta.nl',role:'admin',ini:'AB',av:'av-g',added:'15 jan 2026',login:'Gisteren',active:true},
+  {name:'Emma Jansen',email:'emma@bosta.nl',role:'member',ini:'EJ',av:'av-a',added:'1 feb 2026',login:'5 mrt 2026',active:true},
+  {name:'Tom Bakker',email:'tom@bosta.nl',role:'viewer',ini:'TB',av:'av-gr',added:'1 mrt 2026',login:'Nooit',active:false},
+];
+const panels={dashboard:'Dashboard',plp:'Content Bot — PLP','content-data':'Content Data','meta-writer':'Meta Writer','meta-checker':'Meta Checker','meta-data':'Meta Data',users:'Gebruikers','set-client':'Klantinstellingen','set-api':'API Settings','set-wh':'Webhooks','set-lic':'Licentie'};
+
+function go(el,id){
+  document.querySelectorAll('.ni').forEach(n=>n.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  if(el)el.classList.add('active');
+  const p=document.getElementById('panel-'+id); if(p)p.classList.add('active');
+  document.getElementById('crumb').textContent=panels[id]||id;
+  if(id==='users')rUsers();
+  updS(); closeDrop();
+  lucide.createIcons();
+}
+function toggleG(id){document.getElementById(id).classList.toggle('open');document.getElementById('chev-'+id).classList.toggle('open');}
+
+function toast(msg,type='info',dur=3500){const t=document.getElementById('toast');t.className='toast show t-'+type;document.getElementById('tmsg').textContent=msg;document.getElementById('tsp').style.display=(type==='info'&&!dur)?'block':'none';if(dur)setTimeout(()=>t.className='toast',dur);}
+
+function setMode(m){document.getElementById('ms').style.display=m==='s'?'block':'none';document.getElementById('mb').style.display=m==='b'?'block':'none';document.getElementById('tab-s').classList.toggle('active',m==='s');document.getElementById('tab-b').classList.toggle('active',m==='b');}
+
+function clrS(){['fp','fsl','fk1','fk2','fpe','fct','fex'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});}
+function addS(){const pg=document.getElementById('fp').value.trim(),kw=document.getElementById('fk1').value.trim();if(!pg||!kw){toast('Vul minimaal Paginanaam en Primaire zoekterm in.','err');return;}const item={id:Date.now()+Math.random(),status:'wachtend',page:pg,slug:document.getElementById('fsl').value.trim(),kwP:kw,kwS:document.getElementById('fk2').value.trim(),persona:document.getElementById('fpe').value.trim(),type:document.getElementById('fty').value,tone:document.getElementById('ftn').value,ctx:document.getElementById('fct').value.trim(),ex:document.getElementById('fex').value.trim()};wl.push(item);clrS();rWL();updS();toast('Aanvraag toegevoegd.','ok');}
+
+function gN(url){try{let p=url.replace(/^https?:\/\/[^/]+/,'');let pts=p.split('/').filter(x=>x&&!['nl','en','de','be'].includes(x));if(!pts.length)return 'Homepage';return pts[pts.length-1].replace(/[-_]/g,' ').replace(/\b\w/g,c=>c.toUpperCase());}catch(e){return '';}}
+function pBulk(){const lines=document.getElementById('bi').value.trim().split('\n').map(l=>l.trim()).filter(l=>l);if(!lines.length){toast('Plak eerst URL\'s.','err');return;}br=lines.map((url,i)=>({id:'b'+i+'_'+Date.now(),url,page:gN(url),kwP:'',kwS:'',type:'',tone:'professioneel',ctx:'',sel:true}));document.getElementById('bs1').style.display='none';document.getElementById('bs2').style.display='block';rBT();toast(lines.length+' URL\'s geïmporteerd.','ok');}
+function rBT(){
+  document.getElementById('bcnt').textContent=br.length;
+  const to=[['','— type —'],['categorie','Categoriepagina'],['product','Productpagina'],['blog','Blogartikel'],['landing','Landingspagina'],['home','Homepage']];
+  const tn=['professioneel','vriendelijk','inspirerend','zakelijk'];
+  document.getElementById('btbl').innerHTML=`<table class="btbl"><thead><tr><th class="tcb"></th><th class="tnum">#</th><th>URL</th><th>Paginanaam</th><th>Prim. zoekterm</th><th>Sec. zoektermen</th><th>Type</th><th>Tone</th><th>Context</th><th class="tdl"></th></tr></thead><tbody>${br.map((r,i)=>`<tr id="br-${r.id}" class="${r.sel?'sel':''}"><td class="tcb"><input type="checkbox" ${r.sel?'checked':''} style="accent-color:var(--brand-dk);width:14px;height:14px;" onchange="selR('${r.id}',this.checked)"></td><td class="tnum">${i+1}</td><td class="tu"><input class="cin" style="font-family:monospace;font-size:11.5px;" value="${e(r.url)}" oninput="upd('${r.id}','url',this.value);this.closest('tr').querySelector('.nc2').value=gN(this.value)"></td><td class="tn"><input class="cin nc2" value="${e(r.page)}" placeholder="Paginanaam" oninput="upd('${r.id}','page',this.value)"></td><td class="tk"><input class="cin" value="${e(r.kwP)}" placeholder="zoekterm" oninput="upd('${r.id}','kwP',this.value)"></td><td class="tk2"><input class="cin" value="${e(r.kwS)}" placeholder="secundair" oninput="upd('${r.id}','kwS',this.value)"></td><td class="tty"><select class="csel" onchange="upd('${r.id}','type',this.value)">${to.map(([v,l])=>`<option value="${v}" ${r.type===v?'selected':''}>${l}</option>`).join('')}</select></td><td class="tto"><select class="csel" onchange="upd('${r.id}','tone',this.value)">${tn.map(v=>`<option value="${v}" ${r.tone===v?'selected':''}>${v}</option>`).join('')}</select></td><td class="tc"><input class="cin" value="${e(r.ctx)}" placeholder="context…" oninput="upd('${r.id}','ctx',this.value)"></td><td class="tdl"><button class="dbtn" onclick="dR('${r.id}')"><svg data-lucide="x"></svg></button></td></tr>`).join('')}</tbody></table>`;
+  const a=br.every(r=>r.sel),n=br.every(r=>!r.sel),cb=document.getElementById('sall');if(cb){cb.checked=a;cb.indeterminate=!a&&!n;}
+  updSI();lucide.createIcons();
+}
+function e(s){return(s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function upd(id,f,v){const r=br.find(r=>r.id===id);if(r)r[f]=v;}
+function dR(id){br=br.filter(r=>r.id!==id);rBT();}
+function addBR(){br.push({id:'bn_'+Date.now(),url:'',page:'',kwP:'',kwS:'',type:'',tone:'professioneel',ctx:'',sel:true});rBT();document.getElementById('btbl').scrollTop=99999;}
+function selR(id,v){const r=br.find(r=>r.id===id);if(r)r.sel=v;const row=document.getElementById('br-'+id);if(row)row.classList.toggle('sel',v);updSI();const a=br.every(r=>r.sel),n=br.every(r=>!r.sel),cb=document.getElementById('sall');if(cb){cb.checked=a;cb.indeterminate=!a&&!n;}}
+function selAll(cb){br.forEach(r=>r.sel=cb.checked);rBT();}
+function updSI(){const n=br.filter(r=>r.sel).length;const el=document.getElementById('sinfo');if(el)el.textContent=n?`${n} van ${br.length} geselecteerd`:'';}
+function applyF(){const ty=document.getElementById('flt').value,tn=document.getElementById('fln').value,kw=document.getElementById('flk').value.trim(),cx=document.getElementById('flc').value.trim();const sel=br.filter(r=>r.sel);if(!sel.length){toast('Selecteer eerst rijen.','err');return;}sel.forEach(r=>{if(ty)r.type=ty;if(tn)r.tone=tn;if(kw)r.kwP=kw;if(cx)r.ctx=r.ctx?r.ctx+'; '+cx:cx;});rBT();toast('Toegepast op '+sel.length+' rijen.','ok');}
+function rBulk(){br=[];document.getElementById('bs1').style.display='block';document.getElementById('bs2').style.display='none';document.getElementById('bi').value='';document.getElementById('uc').textContent='';}
+function b2list(){const v=br.filter(r=>r.sel&&(r.url||r.page));if(!v.length){toast('Selecteer rijen.','err');return;}v.forEach(r=>wl.push({id:Date.now()+Math.random(),status:'wachtend',page:r.page||gN(r.url),slug:r.url,kwP:r.kwP,kwS:r.kwS,type:r.type,tone:r.tone,ctx:r.ctx,ex:''}));rWL();updS();rBulk();setMode('s');toast(v.length+' URL\'s toegevoegd.','ok');setTimeout(()=>document.getElementById('wlt').scrollIntoView({behavior:'smooth'}),300);}
+
+document.addEventListener('DOMContentLoaded',()=>{const ta=document.getElementById('bi');if(ta)ta.addEventListener('input',()=>{const n=ta.value.split('\n').filter(l=>l.trim()).length;document.getElementById('uc').textContent=n?`${n} URL${n!==1?"'s":''} gevonden`:''});});
+
+function rWL(){
+  const cnt=document.getElementById('wlcnt'),nc=document.getElementById('nc-wl'),btn=document.getElementById('runbtn');
+  if(cnt)cnt.textContent=wl.length;if(nc)nc.textContent=wl.length;if(btn)btn.disabled=!wl.length;
+  const el=document.getElementById('wlt');
+  if(!wl.length){el.innerHTML='<div class="empty"><svg data-lucide="clipboard-list"></svg><h3>Wishlist is leeg</h3><p>Voeg een aanvraag toe.</p></div>';lucide.createIcons();return;}
+  el.innerHTML=`<table><thead><tr><th>#</th><th>Pagina</th><th>Zoekterm</th><th>Type</th><th>Status</th><th></th></tr></thead><tbody>${wl.map((w,i)=>`<tr><td class="tmono">${i+1}</td><td><div style="font-weight:500;">${w.page||'—'}</div><div class="tmono">${w.slug||''}</div></td><td>${w.kwP||'—'}</td><td>${w.type||'—'}</td><td><span class="badge ${w.status==='wachtend'?'b-bl':'b-gr'}">${w.status}</span></td><td><button class="btn b-dn bsm" onclick="rmWL(${w.id})"><svg data-lucide="x" style="width:13px;height:13px;"></svg></button></td></tr>`).join('')}</tbody></table>`;
+  lucide.createIcons();
+}
+function rmWL(id){wl=wl.filter(w=>w.id!==id);rWL();updS();}
+
+async function runBot(){
+  if(!wh.seo){toast('Stel eerst een Webhook URL in bij Instellingen → Webhooks.','err');return;}
+  document.querySelectorAll('#main-run,#runbtn').forEach(b=>b.disabled=true);
+  const prog=document.getElementById('hprog'),fill=document.getElementById('hfill'),lbl=document.getElementById('hlbl');
+  if(prog)prog.style.display='block';
+  let p=0;const iv=setInterval(()=>{p+=Math.random()*7;if(p>85)p=85;if(fill)fill.style.width=p+'%';if(lbl)lbl.textContent='Content wordt gegenereerd…';},450);
+  try{const res=await fetch(wh.seo,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({type:'seo-content',items:wl,ts:new Date().toISOString()})});clearInterval(iv);if(fill)fill.style.width='100%';res.ok?finR():toast('Webhook fout.','err');}
+  catch(e){clearInterval(iv);if(fill)fill.style.width='100%';finR();toast('Demo modus — geen actieve webhook.','info');}
+  document.querySelectorAll('#main-run,#runbtn').forEach(b=>b.disabled=false);
+  setTimeout(()=>{if(prog)prog.style.display='none';if(fill)fill.style.width='0%';},1800);
+}
+function finR(){wl.forEach(w=>{cd.push({id:w.id,page:w.page,slug:w.slug,kwP:w.kwP,status:'verwerkt',content:'Content wordt gegenereerd via n8n…',date:new Date().toLocaleDateString('nl-NL')});w.status='verwerkt';});rWL();rCD();updS();toast('Bot gestart!','ok');}
+
+function fCD(f,el){cdf=f;document.querySelectorAll('.mtab').forEach(t=>t.classList.remove('active'));el.classList.add('active');rCD();}
+function rCD(){const el=document.getElementById('cdt');if(!el)return;const data=cdf==='all'?cd:cd.filter(c=>cdf==='done'?c.status==='verwerkt':c.status!=='verwerkt');if(!data.length){el.innerHTML='<div class="empty"><svg data-lucide="bot"></svg><h3>Geen content gevonden</h3><p>Start de bot om content te genereren.</p></div>';lucide.createIcons();return;}el.innerHTML=`<table><thead><tr><th>Datum</th><th>Pagina</th><th>Zoekterm</th><th>Preview</th><th>Status</th></tr></thead><tbody>${data.map(c=>`<tr><td class="tmono">${c.date}</td><td><div style="font-weight:500;">${c.page}</div><div class="tmono">${c.slug||''}</div></td><td>${c.kwP}</td><td style="max-width:220px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--muted);">${c.content}</td><td><span class="badge ${c.status==='verwerkt'?'b-gr':'b-am'}">${c.status}</span></td></tr>`).join('')}</tbody></table>`;}
+
+function updS(){const s=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v;};s('s-tot',cd.length+wl.filter(w=>w.status==='wachtend').length);s('s-done',cd.filter(c=>c.status==='verwerkt').length);s('s-pend',wl.filter(w=>w.status==='wachtend').length);s('s-pgs',cd.length);}
+function doExp(){if(!cd.length){toast('Geen data.','err');return;}const csv=['Datum,Pagina,Slug,Zoekterm,Status'].concat(cd.map(r=>`"${r.date}","${r.page}","${r.slug||''}","${r.kwP}","${r.status}"`)).join('\n');const a=document.createElement('a');a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);a.download='content-data.csv';a.click();}
+
+function rUsers(){document.getElementById('utbody').innerHTML=users.map((u,i)=>`<tr><td><div style="display:flex;align-items:center;gap:12px;"><div class="uavatar ${u.av}">${u.ini}</div><div><div style="font-weight:500;font-size:13.5px;">${u.name}</div><div style="font-size:12px;color:var(--muted);">${u.email}</div></div></div></td><td><select style="border:1px solid var(--border);border-radius:var(--r-md);padding:5px 8px;font-size:12.5px;font-family:var(--font);background:var(--white);cursor:pointer;" onchange="chRole(${i},this.value)"><option value="owner" ${u.role==='owner'?'selected':''}>Owner</option><option value="admin" ${u.role==='admin'?'selected':''}>Admin</option><option value="member" ${u.role==='member'?'selected':''}>Member</option><option value="viewer" ${u.role==='viewer'?'selected':''}>Viewer</option></select></td><td class="tmono">${u.added}</td><td class="tmono">${u.login}</td><td><span class="badge ${u.active?'b-gr':'b-gy'}">${u.active?'Actief':'Inactief'}</span></td><td>${u.role!=='owner'?`<button class="btn b-dn bsm" onclick="rmU(${i})"><svg data-lucide="user-minus" style="width:13px;height:13px;"></svg></button>`:''}</td></tr>`).join('');lucide.createIcons();}
+function chRole(i,r){users[i].role=r;toast('Rol bijgewerkt.','ok');}
+function rmU(i){users.splice(i,1);rUsers();toast('Gebruiker verwijderd.','ok');}
+function openM(){document.getElementById('moverlay').classList.add('open');}
+function closeM(){document.getElementById('moverlay').classList.remove('open');}
+function sInvite(){const em=document.getElementById('inv-e').value.trim();if(!em){toast('Voer een e-mailadres in.','err');return;}closeM();toast('Uitnodiging verstuurd naar '+em,'ok');}
+
+function toggleDrop(){document.getElementById('cdrop').classList.toggle('open');}
+function closeDrop(){document.getElementById('cdrop').classList.remove('open');}
+function swClient(name,ini,el){document.getElementById('cn').textContent=name;document.getElementById('ca').textContent=ini;document.querySelectorAll('.cdrop-item').forEach(i=>{i.classList.remove('active');const c=i.querySelector('.cc');if(c)c.remove();});el.classList.add('active');el.insertAdjacentHTML('beforeend','<svg data-lucide="check" class="cc" style="margin-left:auto;width:14px;height:14px;"></svg>');closeDrop();lucide.createIcons();toast('Overgeschakeld naar '+name,'ok');}
+document.addEventListener('click',ev=>{if(!ev.target.closest('.cpill')&&!ev.target.closest('.cdrop'))closeDrop();});
+
+function sWH(){wh.seo=document.getElementById('whs').value.trim();wh.meta=document.getElementById('whm').value.trim();toast('Webhooks opgeslagen.','ok');}
+function sKey(s){const ids={openai:'k-oa',firecrawl:'k-fc',dataforseo:'k-ds'};const el=document.getElementById(ids[s]);if(!el||!el.value.trim()){toast('Voer eerst een API key in.','err');return;}const sts={openai:'st-oa',firecrawl:'st-fc',dataforseo:'st-ds'};const st=document.getElementById(sts[s]);if(st){st.className='ast st-on';st.innerHTML='<svg data-lucide="circle" style="fill:currentColor;width:8px;height:8px;"></svg> Verbonden';lucide.createIcons();}toast(s+' API key opgeslagen.','ok');}
+function tv(id,btn){const el=document.getElementById(id);if(!el)return;el.type=el.type==='password'?'text':'password';btn.innerHTML=el.type==='password'?'<svg data-lucide="eye"></svg>':'<svg data-lucide="eye-off"></svg>';lucide.createIcons();}
+
+updS();
+</script>
+</body>
+</html>
