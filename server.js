@@ -15,5 +15,5 @@ app.get('*', (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`Arthur & Brent AI Content Bot running on port ${PORT}`);
+  console.log('Arthur & Brent AI Content Bot running on port ' + PORT);
 });
