@@ -1351,6 +1351,86 @@ function vtExp(){
   var a=document.createElement('a');a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);a.download='vacatures.csv';a.click();
 }
 
+// STATS & UI HELPERS
+function updS(){
+  var tot=wl.length+cd.length;
+  var done=cd.filter(function(r){return r.status==='klaar';}).length;
+  var pend=cd.filter(function(r){return r.status==='wachtend';}).length;
+  var pgs=cd.length;
+  var s=document.getElementById('s-tot'); if(s) s.textContent=tot;
+  var d=document.getElementById('s-done'); if(d) d.textContent=done;
+  var p=document.getElementById('s-pend'); if(p) p.textContent=pend;
+  var g=document.getElementById('s-pgs'); if(g) g.textContent=pgs;
+  var rb=document.getElementById('runbtn'); if(rb) rb.disabled=!wl.length;
+  var nc=document.getElementById('nc-wl'); if(nc) nc.textContent=wl.length;
+}
+
+// CLIENT DROPDOWN
+function toggleDrop(){
+  var d=document.getElementById('cdrop');
+  if(d) d.style.display=d.style.display==='block'?'none':'block';
+}
+function closeDrop(){
+  var d=document.getElementById('cdrop');
+  if(d) d.style.display='none';
+}
+document.addEventListener('click',function(e){
+  var cpill=document.querySelector('.cpill');
+  var cdrop=document.getElementById('cdrop');
+  if(cdrop && cpill && !cpill.contains(e.target) && !cdrop.contains(e.target)){
+    cdrop.style.display='none';
+  }
+});
+
+// USERS
+function rUsers(){
+  var tb=document.getElementById('utbl'); if(!tb) return;
+  tb.innerHTML=users.map(function(u){
+    return '<tr>'
+      +'<td><div style="display:flex;align-items:center;gap:10px;">'
+      +'<div class="av '+u.av+'">'+u.ini+'</div>'
+      +'<div><div style="font-weight:500;">'+u.name+'</div><div style="font-size:11px;color:var(--muted);">'+u.email+'</div></div>'
+      +'</div></td>'
+      +'<td><span class="badge '+(u.role==='owner'?'b-k':u.role==='admin'?'b-bl':u.role==='member'?'b-gr':'b-gy')+'">'+u.role+'</span></td>'
+      +'<td class="mono">'+u.added+'</td>'
+      +'<td class="mono">'+u.login+'</td>'
+      +'<td><span class="badge '+(u.active?'b-gr':'b-gy')+'">'+(u.active?'Actief':'Inactief')+'</span></td>'
+      +'<td>'+(u.role!=='owner'?'<button class="btn b-gh bsm">Bewerken</button>':'')+'</td>'
+      +'</tr>';
+  }).join('');
+}
+
+// USER MODAL
+function openM(){var m=document.getElementById('movl');if(m)m.style.display='flex';}
+function closeM(){var m=document.getElementById('movl');if(m)m.style.display='none';}
+function sInvite(){
+  var e=document.getElementById('inv-e');
+  if(!e||!e.value.trim()){toast('Voer een e-mailadres in.','t-err');return;}
+  toast('Uitnodiging verstuurd naar '+e.value.trim(),'t-ok');
+  closeM(); e.value='';
+}
+
+// API KEYS & WEBHOOKS
+function tv(id,btn){
+  var inp=document.getElementById(id); if(!inp) return;
+  inp.type=inp.type==='password'?'text':'password';
+  btn.title=inp.type==='password'?'Toon':'Verberg';
+}
+function sKey(service,inputId,statusId){
+  var v=document.getElementById(inputId);
+  var s=document.getElementById(statusId);
+  if(!v||!v.value.trim()){toast('Voer een geldige sleutel in.','t-err');return;}
+  if(s){s.textContent='Opgeslagen';s.className='ast st-on';}
+  toast(service+' sleutel opgeslagen.','t-ok');
+}
+function sWH(){
+  var s=document.getElementById('whs');
+  var m=document.getElementById('whm');
+  if(s) wh.seo=s.value.trim();
+  if(m) wh.meta=m.value.trim();
+  toast('Webhook URLs opgeslagen.','t-ok');
+}
+
 // INIT
 updS();
 rUsers();
