@@ -262,31 +262,18 @@ tr:hover td{background:var(--off);}
       Dashboard
     </div>
     <div class="nav-grp">Content</div>
-    <div class="ni" onclick="go(this,'content-bot')">
-      <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M12 11V5"/><circle cx="12" cy="4" r="1"/><path d="M8 15h.01M12 15h.01M16 15h.01"/></svg>
-      Content Bot
-    </div>
-    <div class="ni" onclick="go(this,'content-data')">
-      <svg viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
-      Content Data
+    <div class="ni" onclick="go(this,'productcategorie')">
+      <svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+      Productcategorie
     </div>
     <div class="nav-grp">SEO</div>
-    <div class="ni" onclick="go(this,'meta-bot')">
-      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-      Meta Bot
+    <div class="ni" onclick="go(this,'meta-checker')">
+      <svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+      Meta Checker
     </div>
-    <div class="ni" onclick="go(this,'meta-data')">
-      <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
-      Meta Data
-    </div>
-    <div class="nav-grp">Recruitment</div>
-    <div class="ni" onclick="go(this,'vacatures')">
-      <svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><line x1="12" y1="12" x2="12" y2="16"/><line x1="10" y1="14" x2="14" y2="14"/></svg>
-      Vacatureteksten
-    </div>
-    <div class="ni" onclick="go(this,'functieprofielen')">
-      <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-      Functieprofielen
+    <div class="ni" onclick="go(this,'meta-writer')">
+      <svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+      Meta Writer
     </div>
     <div class="nav-grp">Beheer</div>
     <div class="ni" onclick="go(this,'huisstijl')">
@@ -370,308 +357,167 @@ tr:hover td{background:var(--off);}
       </div>
     </div>
 
-    <!-- CONTENT BOT -->
-    <div id="panel-content-bot" class="panel">
-      <div class="ph"><h1>Content Bot</h1><p>Beheer en verwerk je SEO content aanvragen</p></div>
+    <!-- PRODUCTCATEGORIE -->
+    <div id="panel-productcategorie" class="panel">
+      <div class="ph"><h1>Productcategorie</h1><p>Genereer SEO-content voor productcategoriepagina's</p></div>
       <div class="itabs">
-        <div class="itab active" id="cbt-1" onclick="cbTab(1)">
+        <div class="itab active" id="pc-1" onclick="pcTab(1)">
           <svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>Enkelvoudig
         </div>
-        <div class="itab" id="cbt-2" onclick="cbTab(2)">
+        <div class="itab" id="pc-2" onclick="pcTab(2)">
           <svg viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>Bulk import
+          <span class="nc" id="nc-pcwl" style="background:var(--lgray);color:var(--muted);">0</span>
         </div>
-        <div class="itab" id="cbt-3" onclick="cbTab(3)">
+        <div class="itab" id="pc-3" onclick="pcTab(3)">
           <svg viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>Wishlist
-          <span class="nc" id="nc-wl" style="background:var(--lgray);color:var(--muted);">0</span>
+          <span class="nc" id="nc-pcwishlist" style="background:var(--lgray);color:var(--muted);">0</span>
+        </div>
+        <div class="itab" id="pc-4" onclick="pcTab(4)">
+          <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Review
         </div>
       </div>
-      <div id="cb-tab1">
+
+      <!-- TAB 1: ENKELVOUDIG -->
+      <div id="pc-tab1">
         <div class="card">
-          <div class="ct"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>Nieuwe Content Aanvraag</div>
+          <div class="ct"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>Nieuwe aanvraag</div>
           <div class="fgrid">
-            <div class="fg"><label class="lbl">Paginanaam *</label><input type="text" id="fp" placeholder="bijv. Categoriepagina Sneakers"></div>
-            <div class="fg"><label class="lbl">URL / Slug</label><input type="text" id="fsl" placeholder="/nl/schoenen/sneakers"></div>
-            <div class="fg"><label class="lbl">Primaire zoekterm *</label><input type="text" id="fk1" placeholder="bijv. sneakers kopen"></div>
-            <div class="fg"><label class="lbl">Secundaire zoektermen</label><input type="text" id="fk2" placeholder="hardloopschoenen, sportschoenen…"></div>
-            <div class="fg full"><label class="lbl">Doelgroep / Persona</label><input type="text" id="fpe" placeholder="bijv. sportief publiek, 25-40 jaar"></div>
-            <div class="fg"><label class="lbl">Contenttype</label><select id="fty"><option value="">— Selecteer type —</option><option value="categorie">Categoriepagina</option><option value="product">Productpagina</option><option value="blog">Blogartikel</option><option value="landing">Landingspagina</option></select></div>
-            <div class="fg"><label class="lbl">Tone of Voice</label><select id="ftn"><option value="professioneel">Professioneel</option><option value="vriendelijk">Vriendelijk &amp; informeel</option><option value="inspirerend">Inspirerend</option><option value="zakelijk">Zakelijk</option></select></div>
-            <div class="fg full"><label class="lbl">Extra context</label><textarea id="fct" placeholder="USP's, concurrenten, speciale aanbiedingen…"></textarea><span class="hint">Meer context = betere output</span></div>
-            <div class="fg full"><label class="lbl">Bestaande content (optioneel)</label><textarea id="fex" placeholder="Bestaande tekst die verbeterd moet worden…" style="min-height:65px;"></textarea></div>
+            <div class="fg"><label class="lbl">Paginanaam *</label><input type="text" id="pc-naam" placeholder="bijv. Sneakers voor heren"></div>
+            <div class="fg"><label class="lbl">URL</label><input type="text" id="pc-url" placeholder="/nl/schoenen/sneakers-heren"></div>
+            <div class="fg"><label class="lbl">Primaire zoekterm *</label><input type="text" id="pc-kw1" placeholder="bijv. sneakers heren"></div>
+            <div class="fg"><label class="lbl">Secundaire zoektermen</label><input type="text" id="pc-kw2" placeholder="bijv. hardloopschoenen heren, sportschoenen"></div>
+            <div class="fg full"><label class="lbl">Ondersteunende zoektermen</label><input type="text" id="pc-kws" placeholder="bijv. nike sneakers, adidas hardlopen, witte sneakers"></div>
           </div>
           <div class="brow">
-            <button class="btn b-k" onclick="addS()"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Toevoegen aan wishlist</button>
-            <button class="btn b-gh" onclick="clrS()">Leegmaken</button>
+            <button class="btn b-k" onclick="pcAddEnkel()"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Toevoegen aan wishlist</button>
+            <button class="btn b-gh" onclick="pcClrEnkel()">Leegmaken</button>
           </div>
         </div>
       </div>
-      <div id="cb-tab2" style="display:none;">
-        <div class="card" id="bs1">
+
+      <!-- TAB 2: BULK IMPORT -->
+      <div id="pc-tab2" style="display:none;">
+        <div class="card" id="pc-bs1">
           <div class="ct"><svg viewBox="0 0 24 24"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/></svg>URL's plakken</div>
-          <div class="pastebox"><textarea id="bi" placeholder="Plak hier je URL's — één per regel"></textarea></div>
+          <div class="pastebox"><textarea id="pc-bi" placeholder="Plak hier URL's — één per regel"></textarea></div>
           <div class="brow">
-            <button class="btn b-k" onclick="pBulk()"><svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>Importeren &amp; bewerken</button>
-            <span id="uc" style="font-size:12px;color:var(--muted);"></span>
+            <button class="btn b-k" onclick="pcParseBulk()"><svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>Importeren &amp; bewerken</button>
+            <span id="pc-uc" style="font-size:12px;color:var(--muted);"></span>
           </div>
         </div>
-        <div id="bs2" style="display:none;">
+        <div id="pc-bs2" style="display:none;">
           <div class="sh">
-            <div class="stt">Bewerk details per URL <span class="scnt" id="bcnt">0</span></div>
+            <div class="stt">Bewerk details per URL <span class="scnt" id="pc-bcnt">0</span></div>
             <div class="brow">
-              <button class="btn b-gh bsm" onclick="rBulk()">Nieuwe import</button>
-              <button class="btn b-gh bsm" onclick="addBR()"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Rij toevoegen</button>
-              <button class="btn b-k" onclick="b2list()"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Alles naar wishlist</button>
+              <button class="btn b-gh bsm" onclick="pcResetBulk()">Nieuwe import</button>
+              <button class="btn b-k" onclick="pcBulk2Wishlist()"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Alles naar wishlist</button>
             </div>
           </div>
-          <div class="fbar">
-            <span style="font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;white-space:nowrap;align-self:center;">Toepassen op selectie:</span>
-            <div class="fg"><label class="lbl">Type</label><select id="flt"><option value="">— ongewijzigd —</option><option value="categorie">Categoriepagina</option><option value="product">Productpagina</option><option value="blog">Blogartikel</option></select></div>
-            <div class="fg"><label class="lbl">Tone</label><select id="fln"><option value="">— ongewijzigd —</option><option value="professioneel">Professioneel</option><option value="vriendelijk">Vriendelijk</option><option value="zakelijk">Zakelijk</option></select></div>
-            <div class="fg" style="min-width:150px;"><label class="lbl">Primaire zoekterm</label><input type="text" id="flk" placeholder="voor alle geselecteerden"></div>
-            <button class="abtn" onclick="applyF()">Toepassen</button>
-          </div>
-          <div class="btwrap" id="btbl"></div>
-          <div style="margin-top:8px;">
-            <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:12px;color:var(--muted);">
-              <input type="checkbox" id="sall" onchange="selAll(this)" style="accent-color:var(--bdk);width:13px;height:13px;">Alles selecteren
-            </label>
-          </div>
+          <div class="btwrap" id="pc-btbl"></div>
         </div>
       </div>
-      <div id="cb-tab3" style="display:none;">
+
+      <!-- TAB 3: WISHLIST -->
+      <div id="pc-tab3" style="display:none;">
         <div class="sh">
-          <div class="stt">Wishlist <span class="scnt" id="wlcnt">0</span></div>
-          <button class="btn b-k" id="runbtn" onclick="runBot()" disabled>
+          <div class="stt">Wishlist <span class="scnt" id="pc-wlcnt">0</span></div>
+          <button class="btn b-k" id="pc-runbtn" onclick="pcRunBot()" disabled>
             <svg viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>Verwerken met bot
           </button>
         </div>
-        <div class="tw" id="wlt">
+        <div class="tw" id="pc-wlt">
           <div class="empty"><svg viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/></svg><h3>Wishlist is leeg</h3><p>Voeg aanvragen toe via Enkelvoudig of Bulk import.</p></div>
         </div>
       </div>
-    </div>
 
-    <!-- CONTENT DATA -->
-    <div id="panel-content-data" class="panel">
-      <div class="ph"><h1>Content Data</h1><p>Overzicht van gegenereerde SEO content</p></div>
-      <div class="sh">
-        <div class="itabs" style="margin-bottom:0;border:none;">
-          <div class="itab active" onclick="fCD('all',this)" style="border-bottom:none;padding:6px 14px;">Alles</div>
-          <div class="itab" onclick="fCD('done',this)" style="border-bottom:none;padding:6px 14px;">Afgerond</div>
-          <div class="itab" onclick="fCD('pend',this)" style="border-bottom:none;padding:6px 14px;">Wachtend</div>
-        </div>
-        <button class="btn b-gh" onclick="doExp()"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>CSV exporteren</button>
-      </div>
-      <div class="tw" id="cdt"><div class="empty"><svg viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg><h3>Nog geen content gegenereerd</h3><p>Start de bot via Dashboard of de Content Bot.</p></div></div>
-    </div>
-
-    <!-- META BOT -->
-    <div id="panel-meta-bot" class="panel">
-      <div class="ph"><h1>Meta Bot</h1><p>Genereer en controleer meta titles &amp; descriptions</p></div>
-      <div class="itabs">
-        <div class="itab active" id="mbt-1" onclick="mbTab(1)">
-          <svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>Writer
-        </div>
-        <div class="itab" id="mbt-2" onclick="mbTab(2)">
-          <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Checker
-        </div>
-      </div>
-      <div id="mb-tab1">
-        <div class="card">
-          <div class="ct"><svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>URL's invoeren</div>
-          <div class="pastebox" style="margin-bottom:12px;"><textarea placeholder="Plak URL's voor meta generatie — één per regel…"></textarea></div>
-          <div class="fgrid" style="margin-bottom:13px;">
-            <div class="fg"><label class="lbl">Taal</label><select><option>Nederlands</option><option>Engels</option><option>Duits</option></select></div>
-            <div class="fg"><label class="lbl">Max. title lengte</label><input type="number" value="60"></div>
-          </div>
-          <button class="btn b-k"><svg viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>Meta genereren</button>
-        </div>
-      </div>
-      <div id="mb-tab2" style="display:none;">
-        <div class="card">
-          <div class="ct"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Meta data controleren</div>
-          <div class="pastebox" style="margin-bottom:12px;"><textarea placeholder="Plak URL's of bestaande meta data om te analyseren…"></textarea></div>
-          <div class="fgrid" style="margin-bottom:13px;">
-            <div class="fg"><label class="lbl">Primaire zoekterm</label><input type="text" placeholder="bijv. sneakers kopen"></div>
-            <div class="fg"><label class="lbl">Controleer op</label><select><option>Alles</option><option>Alleen lengte</option><option>Alleen zoekterm</option></select></div>
-          </div>
-          <button class="btn b-k"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>Analyseren</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- META DATA -->
-    <div id="panel-meta-data" class="panel">
-      <div class="ph"><h1>Meta Data</h1><p>Overzicht van gegenereerde meta data</p></div>
-      <div class="sh"><div></div><button class="btn b-gh"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>CSV exporteren</button></div>
-      <div class="tw"><div class="empty"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg><h3>Geen meta data beschikbaar</h3><p>Start een Meta Bot Writer run om resultaten te zien.</p></div></div>
-    </div>
-
-    <!-- VACATURETEKSTEN -->
-    <div id="panel-vacatures" class="panel">
-      <div class="ph"><h1>Vacatureteksten</h1><p>Genereer professionele vacatureteksten op basis van jouw input</p></div>
-
-      <div class="itabs">
-        <div class="itab active" id="vt-1" onclick="vtTab(1)">
-          <svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>Schrijven
-        </div>
-        <div class="itab" id="vt-2" onclick="vtTab(2)">
-          <svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>Overzicht
-        </div>
-      </div>
-
-      <!-- TAB 1: SCHRIJVEN -->
-      <div id="vt-tab1">
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
-
-          <!-- LINKER KOLOM -->
-          <div>
-            <div class="card">
-              <div class="ct"><svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><line x1="12" y1="12" x2="12" y2="16"/><line x1="10" y1="14" x2="14" y2="14"/></svg>Basisgegevens</div>
-              <div class="fg" style="margin-bottom:10px;"><label class="lbl">Functietitel *</label><input type="text" id="vt-titel" placeholder="bijv. Customer Service Medewerker"></div>
-              <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
-                <div class="fg"><label class="lbl">Locatie *</label><input type="text" id="vt-loc" placeholder="bijv. Amsterdam / Hybrid"></div>
-                <div class="fg"><label class="lbl">Aantal uren *</label><input type="text" id="vt-uren" placeholder="bijv. 32–40 uur per week"></div>
-              </div>
-              <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
-                <div class="fg"><label class="lbl">Salarisrange</label><input type="text" id="vt-sal" placeholder="bijv. €2.800 – €3.500"></div>
-                <div class="fg"><label class="lbl">Soort contract</label><select id="vt-contract"><option value="vast">Vast contract</option><option value="tijdelijk">Tijdelijk contract</option><option value="tijdelijk-uitzicht">Tijdelijk met uitzicht op vast</option><option value="freelance">Freelance / ZZP</option><option value="stage">Stage</option></select></div>
-              </div>
-              <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
-                <div class="fg"><label class="lbl">Opleidingsniveau</label><select id="vt-opl"><option value="vmbo">VMBO</option><option value="mbo">MBO</option><option value="hbo" selected>HBO</option><option value="wo">WO</option><option value="hbo-wo">HBO / WO</option><option value="geen">Geen vereiste</option></select></div>
-                <div class="fg"><label class="lbl">Reageren voor</label><input type="text" id="vt-datum" placeholder="bijv. 1 april 2026"></div>
-              </div>
-              <div class="fg"><label class="lbl">Contactpersoon</label><input type="text" id="vt-contact" placeholder="bijv. Lisa de Vries — l.devries@bosta.nl"></div>
-            </div>
-
-            <div class="card">
-              <div class="ct"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>Teamomschrijving</div>
-              <div class="fg"><textarea id="vt-team" placeholder="Beschrijf het team: grootte, sfeer, hoe het samenwerkt, de positie van deze rol binnen het team…" style="min-height:100px;"></textarea></div>
-            </div>
-          </div>
-
-          <!-- RECHTER KOLOM -->
-          <div>
-            <div class="card">
-              <div class="ct"><svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>Vacaturetekst inhoud</div>
-              <div class="fg" style="margin-bottom:10px;"><label class="lbl">Introductietekst / Vacaturehook *</label><textarea id="vt-intro" placeholder="De openingszin of alinea die de lezer direct triggert. Wat maakt deze vacature bijzonder?" style="min-height:80px;"></textarea></div>
-              <div class="fg" style="margin-bottom:10px;"><label class="lbl">Wat ga je doen? *</label><textarea id="vt-doen" placeholder="Beschrijf de dagelijkse werkzaamheden en verantwoordelijkheden…" style="min-height:90px;"></textarea></div>
-              <div class="fg" style="margin-bottom:10px;"><label class="lbl">Wat bieden wij?</label><textarea id="vt-bieden" placeholder="Arbeidsvoorwaarden, groeimogelijkheden, cultuur, voordelen…" style="min-height:80px;"></textarea></div>
-              <div class="fg"><label class="lbl">Wat vragen we van jou? *</label><textarea id="vt-vragen" placeholder="Vereiste vaardigheden, ervaring, opleiding, persoonlijkheid…" style="min-height:80px;"></textarea></div>
-            </div>
-
-            <div class="brow" style="justify-content:flex-end;margin-top:4px;">
-              <button class="btn b-gh" onclick="clrVT()">Leegmaken</button>
-              <button class="btn b-k" style="font-size:13px;padding:9px 18px;" onclick="addVT()">
-                <svg viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-                Vacaturetekst genereren
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- TAB 2: OVERZICHT -->
-      <div id="vt-tab2" style="display:none;">
+      <!-- TAB 4: REVIEW -->
+      <div id="pc-tab4" style="display:none;">
         <div class="sh">
-          <div class="stt">Gegenereerde vacatures <span class="scnt" id="vt-cnt">0</span></div>
-          <button class="btn b-gh" onclick="vtExp()">
-            <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>CSV exporteren
-          </button>
+          <div class="stt">Gegenereerde content <span class="scnt" id="pc-rcnt">0</span></div>
+          <button class="btn b-gh" onclick="pcExport()"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>CSV exporteren</button>
         </div>
-        <div class="tw" id="vt-list">
-          <div class="empty">
-            <svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>
-            <h3>Nog geen vacatures gegenereerd</h3>
-            <p>Vul het formulier in en genereer je eerste vacaturetekst.</p>
-          </div>
+        <div class="tw" id="pc-review">
+          <div class="empty"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><h3>Nog geen content gegenereerd</h3><p>Verwerk de wishlist om resultaten te zien.</p></div>
         </div>
       </div>
     </div>
 
-    <!-- FUNCTIEPROFIELEN -->
-    <div id="panel-functieprofielen" class="panel">
-      <div class="ph"><h1>Functieprofielen</h1><p>Schrijf evergreen landingspagina's voor functiegroepen om talent aan te trekken</p></div>
+    <!-- META CHECKER -->
+    <div id="panel-meta-checker" class="panel">
+      <div class="ph"><h1>Meta Checker</h1><p>Controleer bestaande meta titles &amp; descriptions</p></div>
       <div class="itabs">
-        <div class="itab active" id="fp-1" onclick="fpTab(1)">
-          <svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>Nieuw profiel
+        <div class="itab active" id="mck-1" onclick="mckTab(1)">
+          <svg viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>Bulk
         </div>
-        <div class="itab" id="fp-2" onclick="fpTab(2)">
-          <svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>Overzicht
-        </div>
-      </div>
-
-      <div id="fp-tab1">
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
-
-          <div>
-            <div class="card">
-              <div class="ct"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>Functiegroep &amp; doelgroep</div>
-              <div class="fg" style="margin-bottom:10px;"><label class="lbl">Functiegroep / paginatitel *</label><input type="text" id="fp-titel" placeholder="bijv. Customer Service Medewerkers"><span class="hint">Dit wordt de H1 van de landingspagina</span></div>
-              <div class="fg" style="margin-bottom:10px;"><label class="lbl">URL / Slug</label><input type="text" id="fp-slug" placeholder="bijv. /werken-bij/customer-service"></div>
-              <div class="fg" style="margin-bottom:10px;"><label class="lbl">Sector / Branche</label><input type="text" id="fp-sector" placeholder="bijv. E-commerce, Logistiek, Retail"></div>
-              <div class="fg"><label class="lbl">Doelgroep omschrijving *</label><textarea id="fp-doelgroep" placeholder="Wie wil je aanspreken? Ervaringsniveau, achtergrond, motivatie, levensfase…" style="min-height:90px;"></textarea></div>
-            </div>
-            <div class="card">
-              <div class="ct"><svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Werkomgeving</div>
-              <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
-                <div class="fg"><label class="lbl">Locatie(s)</label><input type="text" id="fp-locatie" placeholder="bijv. Heel Nederland / Amsterdam"></div>
-                <div class="fg"><label class="lbl">Werkmodel</label><select id="fp-werkmodel"><option value="op-kantoor">Op kantoor</option><option value="hybride" selected>Hybride</option><option value="remote">Volledig remote</option><option value="wisselend">Wisselende locaties</option></select></div>
-              </div>
-              <div class="fg"><label class="lbl">Sfeer &amp; cultuur</label><textarea id="fp-sfeer" placeholder="Hoe is het werken in deze rol? Informeel, dynamisch, zelfstandig…" style="min-height:70px;"></textarea></div>
-            </div>
-            <div class="card">
-              <div class="ct"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>SEO &amp; CTA</div>
-              <div class="fg" style="margin-bottom:10px;"><label class="lbl">Primaire zoekterm *</label><input type="text" id="fp-kw1" placeholder="bijv. klantenservice medewerker vacature"><span class="hint">Hoofdzoekterm voor de pagina</span></div>
-              <div class="fg" style="margin-bottom:10px;"><label class="lbl">Secundaire zoektermen</label><input type="text" id="fp-kw2" placeholder="bijv. klantenservice amsterdam, klantcontact werk"></div>
-              <div class="fg"><label class="lbl">Call-to-action</label><select id="fp-cta"><option value="vacatures">Bekijk onze openstaande vacatures</option><option value="solliciteer">Solliciteer direct open</option><option value="contact">Neem contact op</option><option value="aanmelden">Meld je aan voor job alerts</option><option value="eigen">Eigen CTA (zie extra context)</option></select></div>
-            </div>
-          </div>
-
-          <div>
-            <div class="card">
-              <div class="ct"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/></svg>Pagina-inhoud</div>
-              <div class="fg" style="margin-bottom:10px;"><label class="lbl">Introductietekst / Hook *</label><textarea id="fp-intro" placeholder="Wat maakt deze functiegroep bijzonder? Spreek de bezoeker direct aan." style="min-height:80px;"></textarea></div>
-              <div class="fg" style="margin-bottom:10px;"><label class="lbl">Wat houdt dit werk in?</label><textarea id="fp-werk" placeholder="Algemene omschrijving van de werkzaamheden — niet functie-specifiek maar als rode draad voor de hele groep." style="min-height:80px;"></textarea></div>
-              <div class="fg" style="margin-bottom:10px;"><label class="lbl">Wat maakt jullie aantrekkelijk als werkgever?</label><textarea id="fp-usp" placeholder="USP's voor deze doelgroep: ontwikkelkansen, cultuur, arbeidsvoorwaarden, maatschappelijke impact…" style="min-height:75px;"></textarea></div>
-              <div class="fg"><label class="lbl">Groeipaden &amp; doorgroeimogelijkheden</label><textarea id="fp-groei" placeholder="Welke stappen kan iemand in deze functiegroep zetten? Specialiseren, teamlead, intern doorgroeien…" style="min-height:70px;"></textarea></div>
-            </div>
-            <div class="card">
-              <div class="ct"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Profiel &amp; stijl</div>
-              <div class="fg" style="margin-bottom:10px;"><label class="lbl">Vereiste achtergrond (algemeen)</label><textarea id="fp-achtergrond" placeholder="Welke achtergrond of houding past bij deze functiegroep? Denk breed, niet als strikte eisen." style="min-height:65px;"></textarea></div>
-              <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
-                <div class="fg"><label class="lbl">Tone of Voice</label><select id="fp-ton"><option value="informeel" selected>Informeel &amp; direct</option><option value="professioneel">Professioneel</option><option value="inspirerend">Inspirerend</option><option value="zakelijk">Zakelijk &amp; formeel</option></select></div>
-                <div class="fg"><label class="lbl">Taal</label><select id="fp-taal"><option value="nl" selected>Nederlands</option><option value="en">Engels</option></select></div>
-              </div>
-              <div class="fg"><label class="lbl">Extra context voor de AI</label><textarea id="fp-ctx" placeholder="Aanvullende informatie of specifieke wensen…" style="min-height:50px;"></textarea></div>
-            </div>
-            <div class="brow" style="justify-content:flex-end;margin-top:4px;">
-              <button class="btn b-gh" onclick="clrFP()">Leegmaken</button>
-              <button class="btn b-k" style="font-size:13px;padding:9px 18px;" onclick="addFP()">
-                <svg viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>Functieprofiel genereren
-              </button>
-            </div>
-          </div>
-
+        <div class="itab" id="mck-2" onclick="mckTab(2)">
+          <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Review
         </div>
       </div>
 
-      <div id="fp-tab2" style="display:none;">
+      <!-- MCK TAB 1: BULK -->
+      <div id="mck-tab1">
+        <div class="card">
+          <div class="ct"><svg viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>URL's invoeren</div>
+          <div class="pastebox" style="margin-bottom:12px;"><textarea id="mck-urls" placeholder="Plak URL's om te controleren — één per regel&#10;bijv. https://bosta.nl/nl/schoenen/sneakers"></textarea></div>
+          <div class="brow">
+            <button class="btn b-k" onclick="mckRun()"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>Analyseren</button>
+            <span id="mck-uc" style="font-size:12px;color:var(--muted);"></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- MCK TAB 2: REVIEW -->
+      <div id="mck-tab2" style="display:none;">
         <div class="sh">
-          <div class="stt">Gegenereerde profielen <span class="scnt" id="fp-cnt">0</span></div>
-          <button class="btn b-gh" onclick="fpExp()"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>CSV exporteren</button>
+          <div class="stt">Geanalyseerde URL's <span class="scnt" id="mck-rcnt">0</span></div>
+          <button class="btn b-gh" onclick="mckExport()"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>CSV exporteren</button>
         </div>
-        <div class="tw" id="fp-list">
-          <div class="empty">
-            <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-            <h3>Nog geen functieprofielen gegenereerd</h3>
-            <p>Vul het formulier in en genereer je eerste functieprofiel pagina.</p>
-          </div>
+        <div class="tw" id="mck-review">
+          <div class="empty"><svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg><h3>Nog geen URL's geanalyseerd</h3><p>Voer URL's in via het Bulk tabblad om resultaten te zien.</p></div>
         </div>
+        <p style="font-size:12px;color:var(--muted);margin-top:10px;">Kolommen: URL | Huidige Titel | Huidige Beschrijving</p>
       </div>
     </div>
 
-    <!-- HUISSTIJL -->
+    <!-- META WRITER -->
+    <div id="panel-meta-writer" class="panel">
+      <div class="ph"><h1>Meta Writer</h1><p>Genereer nieuwe meta titles &amp; descriptions</p></div>
+      <div class="itabs">
+        <div class="itab active" id="mwr-1" onclick="mwrTab(1)">
+          <svg viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>Bulk
+        </div>
+        <div class="itab" id="mwr-2" onclick="mwrTab(2)">
+          <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Review
+        </div>
+      </div>
+
+      <!-- MWR TAB 1: BULK -->
+      <div id="mwr-tab1">
+        <div class="card">
+          <div class="ct"><svg viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>URL's invoeren</div>
+          <div class="pastebox" style="margin-bottom:12px;"><textarea id="mwr-urls" placeholder="Plak URL's voor meta generatie — één per regel&#10;bijv. https://bosta.nl/nl/schoenen/sneakers"></textarea></div>
+          <div class="brow">
+            <button class="btn b-k" onclick="mwrRun()"><svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>Meta genereren</button>
+            <span id="mwr-uc" style="font-size:12px;color:var(--muted);"></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- MWR TAB 2: REVIEW -->
+      <div id="mwr-tab2" style="display:none;">
+        <div class="sh">
+          <div class="stt">Gegenereerde meta <span class="scnt" id="mwr-rcnt">0</span></div>
+          <button class="btn b-gh" onclick="mwrExport()"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>CSV exporteren</button>
+        </div>
+        <div class="tw" id="mwr-review">
+          <div class="empty"><svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg><h3>Nog geen meta gegenereerd</h3><p>Voer URL's in via het Bulk tabblad om resultaten te zien.</p></div>
+        </div>
+        <p style="font-size:12px;color:var(--muted);margin-top:10px;">Kolommen: URL | Nieuwe Titel | Nieuwe Beschrijving | Huidige Titel | Huidige Beschrijving</p>
+      </div>
+    </div>
+
+
+        <!-- HUISSTIJL -->
     <div id="panel-huisstijl" class="panel">
       <div class="ph"><h1>Huisstijl &amp; Stijl</h1><p>Upload documenten die de AI gebruikt als basis voor tone of voice en schrijfstijl</p></div>
       <div class="itabs">
@@ -907,8 +753,13 @@ var users=[
 ];
 
 var panelLabels={
-  'dashboard':'Dashboard','content-bot':'Content Bot','content-data':'Content Data',
-  'meta-bot':'Meta Bot','meta-data':'Meta Data','vacatures':'Vacatureteksten','functieprofielen':'Functieprofielen','huisstijl':'Huisstijl & Stijl','users':'Gebruikers','settings':'Instellingen'
+  'dashboard':'Dashboard',
+  'productcategorie':'Productcategorie',
+  'meta-checker':'Meta Checker',
+  'meta-writer':'Meta Writer',
+  'huisstijl':'Huisstijl & Stijlgids',
+  'users':'Gebruikers',
+  'settings':'Instellingen'
 };
 
 // NAVIGATION
@@ -926,16 +777,22 @@ function go(el,id){
 }
 
 // TABS
-function cbTab(n){
-  [1,2,3].forEach(function(i){
-    document.getElementById('cbt-'+i).classList.toggle('active',i===n);
-    document.getElementById('cb-tab'+i).style.display=i===n?'block':'none';
+function pcTab(n){
+  [1,2,3,4].forEach(function(i){
+    document.getElementById('pc-'+i).classList.toggle('active',i===n);
+    document.getElementById('pc-tab'+i).style.display=i===n?'block':'none';
   });
 }
-function mbTab(n){
+function mckTab(n){
   [1,2].forEach(function(i){
-    document.getElementById('mbt-'+i).classList.toggle('active',i===n);
-    document.getElementById('mb-tab'+i).style.display=i===n?'block':'none';
+    document.getElementById('mck-'+i).classList.toggle('active',i===n);
+    document.getElementById('mck-tab'+i).style.display=i===n?'block':'none';
+  });
+}
+function mwrTab(n){
+  [1,2].forEach(function(i){
+    document.getElementById('mwr-'+i).classList.toggle('active',i===n);
+    document.getElementById('mwr-tab'+i).style.display=i===n?'block':'none';
   });
 }
 function setTab(n){
@@ -987,7 +844,7 @@ function gN(url){
 }
 function pBulk(){
   var lines=document.getElementById('bi').value.trim().split('\n').map(function(l){return l.trim();}).filter(function(l){return l;});
-  if(!lines.length){toast('Plak eerst URL\'s.','t-err');return;}
+  if(!lines.length){toast('Plak eerst URLs.','t-err');return;}
   br=lines.map(function(url,i){return {id:'b'+i+'_'+Date.now(),url:url,page:gN(url),kwP:'',kwS:'',type:'',tone:'professioneel',ctx:'',sel:true};});
   document.getElementById('bs1').style.display='none';
   document.getElementById('bs2').style.display='block';
@@ -1084,186 +941,219 @@ function finR(){
   rWL();rCD();updS();toast('Bot gestart! Content verschijnt zodra n8n klaar is.','t-ok');
 }
 
-// CONTENT DATA
-function fCD(f,el){
-  cdf=f;
-  document.querySelectorAll('#panel-content-data .itab').forEach(function(t){t.classList.remove('active');});
-  el.classList.add('active');
-  rCD();
-}
-function rCD(){
-  var el=document.getElementById('cdt'); if(!el)return;
-  var data=cdf==='all'?cd:cd.filter(function(c){return cdf==='done'?c.status==='verwerkt':c.status!=='verwerkt';});
-  if(!data.length){el.innerHTML='<div class="empty"><svg viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg><h3>Geen content gevonden</h3><p>Start de bot om content te genereren.</p></div>';return;}
-  el.innerHTML='<table><thead><tr><th>Datum</th><th>Pagina</th><th>Zoekterm</th><th>Status</th></tr></thead><tbody>'+
-    data.map(function(c){return '<tr><td class="mono">'+c.date+'</td><td><div style="font-weight:500;">'+c.page+'</div></td><td>'+c.kwP+'</td><td><span class="badge '+(c.status==='verwerkt'?'b-gr':'b-am')+'">'+c.status+'</span></td></tr>';}).join('')+
-    '</tbody></table>';
-}
+// PRODUCTCATEGORIE
+var pcWishlist = [];
+var pcReviews  = [];
+var pcBulkData = [];
 
-// STATS
-function updS(){
-  var s=function(id,v){var e=document.getElementById(id);if(e)e.textContent=v;};
-  s('s-tot',cd.length+wl.filter(function(w){return w.status==='wachtend';}).length);
-  s('s-done',cd.filter(function(c){return c.status==='verwerkt';}).length);
-  s('s-pend',wl.filter(function(w){return w.status==='wachtend';}).length);
-  s('s-pgs',cd.length);
-}
-
-// EXPORT
-function doExp(){
-  if(!cd.length){toast('Geen data.','t-err');return;}
-  var csv=['Datum,Pagina,Zoekterm,Status'].concat(cd.map(function(r){return '"'+r.date+'","'+r.page+'","'+r.kwP+'","'+r.status+'"';})).join('\n');
-  var a=document.createElement('a');a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);a.download='content-data.csv';a.click();
-}
-
-// USERS
-function rUsers(){
-  document.getElementById('utbody').innerHTML=users.map(function(u,i){
-    return '<tr><td><div style="display:flex;align-items:center;gap:11px;"><div class="uav '+u.av+'">'+u.ini+'</div><div><div style="font-weight:500;font-size:13px;">'+u.name+'</div><div style="font-size:11.5px;color:var(--muted);">'+u.email+'</div></div></div></td>'+
-      '<td><select style="border:1px solid var(--border);border-radius:var(--rm);padding:5px 8px;font-size:12px;font-family:var(--font);background:var(--white);cursor:pointer;" onchange="chRole('+i+',this.value)"><option value="owner"'+(u.role==='owner'?' selected':'')+'>Owner</option><option value="admin"'+(u.role==='admin'?' selected':'')+'>Admin</option><option value="member"'+(u.role==='member'?' selected':'')+'>Member</option><option value="viewer"'+(u.role==='viewer'?' selected':'')+'>Viewer</option></select></td>'+
-      '<td class="mono">'+u.added+'</td><td class="mono">'+u.login+'</td>'+
-      '<td><span class="badge '+(u.active?'b-gr':'b-gy')+'">'+(u.active?'Actief':'Inactief')+'</span></td>'+
-      '<td>'+(u.role!=='owner'?'<button class="btn b-dn bsm" onclick="rmU('+i+')"><svg viewBox="0 0 24 24" style="width:12px;height:12px;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round;"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="22" y1="18" x2="16" y2="18"/></svg></button>':'')+'</td></tr>';
-  }).join('');
-}
-function chRole(i,r){users[i].role=r;toast('Rol bijgewerkt.','t-ok');}
-function rmU(i){if(!confirm('Gebruiker verwijderen?'))return;users.splice(i,1);rUsers();toast('Gebruiker verwijderd.','t-ok');}
-function openM(){document.getElementById('movl').classList.add('open');}
-function closeM(){document.getElementById('movl').classList.remove('open');}
-function sInvite(){
-  var em=document.getElementById('inv-e').value.trim();
-  if(!em){toast('Voer een e-mailadres in.','t-err');return;}
-  closeM(); toast('Uitnodiging verstuurd naar '+em,'t-ok');
-}
-
-// CLIENT DROPDOWN
-function toggleDrop(){document.getElementById('cdrop').classList.toggle('open');}
-function closeDrop(){document.getElementById('cdrop').classList.remove('open');}
-function swClient(name,ini,el){
-  document.getElementById('cname').textContent=name;
-  document.getElementById('cav').textContent=ini;
-  document.querySelectorAll('.cd-item').forEach(function(i){i.classList.remove('sel');});
-  el.classList.add('sel');
-  closeDrop(); toast('Overgeschakeld naar '+name,'t-ok');
-}
-document.addEventListener('click',function(ev){
-  if(!ev.target.closest('.cpill')&&!ev.target.closest('.cdrop'))closeDrop();
-});
-
-// SETTINGS
-function sWH(){
-  wh.seo=document.getElementById('whs').value.trim();
-  wh.meta=document.getElementById('whm').value.trim();
-  toast('Webhooks opgeslagen.','t-ok');
-}
-function sKey(s,kid,sid){
-  var el=document.getElementById(kid);
-  if(!el||!el.value.trim()){toast('Voer eerst een API key in.','t-err');return;}
-  var st=document.getElementById(sid);
-  if(st){st.className='ast st-on';st.textContent='Verbonden';}
-  toast(s+' API key opgeslagen.','t-ok');
-}
-function tv(id,btn){
-  var el=document.getElementById(id);if(!el)return;
-  var isPass=el.type==='password';
-  el.type=isPass?'text':'password';
-}
-
-// FUNCTIEPROFIELEN
-var functieprofielen = [];
-
-function fpTab(n) {
-  [1,2].forEach(function(i) {
-    document.getElementById('fp-'+i).classList.toggle('active', i===n);
-    document.getElementById('fp-tab'+i).style.display = i===n ? 'block' : 'none';
+function pcClrEnkel(){
+  ['pc-naam','pc-url','pc-kw1','pc-kw2','pc-kws'].forEach(function(id){
+    var e=document.getElementById(id); if(e) e.value='';
   });
 }
-
-function clrFP() {
-  ['fp-titel','fp-slug','fp-sector','fp-doelgroep','fp-locatie','fp-sfeer',
-   'fp-kw1','fp-kw2','fp-intro','fp-werk','fp-usp','fp-groei','fp-achtergrond','fp-ctx']
-  .forEach(function(id) { var e = document.getElementById(id); if (e) e.value = ''; });
-  var wm = document.getElementById('fp-werkmodel'); if (wm) wm.selectedIndex = 1;
-  var tn = document.getElementById('fp-ton'); if (tn) tn.selectedIndex = 0;
-  var tl = document.getElementById('fp-taal'); if (tl) tl.selectedIndex = 0;
-  var ct = document.getElementById('fp-cta'); if (ct) ct.selectedIndex = 0;
-}
-
-function addFP() {
-  var titel = document.getElementById('fp-titel').value.trim();
-  var doel  = document.getElementById('fp-doelgroep').value.trim();
-  var intro = document.getElementById('fp-intro').value.trim();
-  var kw1   = document.getElementById('fp-kw1').value.trim();
-  if (!titel || !doel || !intro || !kw1) {
-    toast('Vul minimaal Functiegroep, Doelgroep, Introductietekst en Primaire zoekterm in.', 't-err');
-    return;
-  }
-  var p = {
-    id: Date.now(), titel: titel,
-    slug: document.getElementById('fp-slug').value.trim(),
-    sector: document.getElementById('fp-sector').value.trim(),
-    doelgroep: doel,
-    locatie: document.getElementById('fp-locatie').value.trim(),
-    werkmodel: document.getElementById('fp-werkmodel').value,
-    sfeer: document.getElementById('fp-sfeer').value.trim(),
-    kw1: kw1, kw2: document.getElementById('fp-kw2').value.trim(),
-    cta: document.getElementById('fp-cta').value,
-    intro: intro,
-    werk: document.getElementById('fp-werk').value.trim(),
-    usp: document.getElementById('fp-usp').value.trim(),
-    groei: document.getElementById('fp-groei').value.trim(),
-    achtergrond: document.getElementById('fp-achtergrond').value.trim(),
-    ton: document.getElementById('fp-ton').value,
-    taal: document.getElementById('fp-taal').value,
-    ctx: document.getElementById('fp-ctx').value.trim(),
-    status: 'wachtend', date: new Date().toLocaleDateString('nl-NL')
+function pcAddEnkel(){
+  var naam = document.getElementById('pc-naam').value.trim();
+  var kw1  = document.getElementById('pc-kw1').value.trim();
+  if(!naam||!kw1){toast('Vul minimaal Paginanaam en Primaire zoekterm in.','t-err');return;}
+  var item = {
+    id: Date.now(),
+    naam: naam,
+    url:  document.getElementById('pc-url').value.trim(),
+    kw1:  kw1,
+    kw2:  document.getElementById('pc-kw2').value.trim(),
+    kws:  document.getElementById('pc-kws').value.trim(),
+    status: 'wachtend'
   };
-  functieprofielen.push(p);
-  rFP(); fpTab(2);
-  toast('Functieprofiel toegevoegd. Bot wordt gestart zodra webhook is ingesteld.', 't-ok');
+  pcWishlist.push(item);
+  pcRenderWishlist();
+  pcClrEnkel();
+  pcTab(3);
+  toast('Toegevoegd aan wishlist.','t-ok');
 }
 
-function rFP() {
-  var el = document.getElementById('fp-list');
-  var cnt = document.getElementById('fp-cnt');
-  if (cnt) cnt.textContent = functieprofielen.length;
-  if (!functieprofielen.length) {
-    el.innerHTML = '<div class="empty"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg><h3>Nog geen functieprofielen gegenereerd</h3><p>Vul het formulier in en genereer je eerste functieprofiel pagina.</p></div>';
+function pcParseBulk(){
+  var raw = document.getElementById('pc-bi').value.trim();
+  if(!raw){toast('Plak eerst URLs.','t-err');return;}
+  var lines = raw.split('\n').map(function(l){return l.trim();}).filter(Boolean);
+  pcBulkData = lines.map(function(url,i){
+    return {id:Date.now()+i, url:url, naam:'', kw1:'', kw2:'', kws:''};
+  });
+  document.getElementById('pc-bs1').style.display='none';
+  document.getElementById('pc-bs2').style.display='block';
+  document.getElementById('pc-bcnt').textContent=pcBulkData.length;
+  document.getElementById('pc-uc').textContent=lines.length+' URLs';
+  pcRenderBulkTable();
+}
+function pcResetBulk(){
+  pcBulkData=[];
+  document.getElementById('pc-bi').value='';
+  document.getElementById('pc-bs1').style.display='block';
+  document.getElementById('pc-bs2').style.display='none';
+  document.getElementById('pc-uc').textContent='';
+}
+function pcRenderBulkTable(){
+  var tbl = document.getElementById('pc-btbl');
+  if(!pcBulkData.length){tbl.innerHTML='';return;}
+  tbl.innerHTML = '<table><thead><tr><th>URL</th><th>Paginanaam</th><th>Primaire zoekterm</th><th>Secundaire zoektermen</th><th>Ondersteunende zoektermen</th></tr></thead><tbody>'+
+    pcBulkData.map(function(r){
+      return '<tr>'+
+        '<td class="mono" style="font-size:11px;">'+r.url+'</td>'+
+        '<td><input type="text" class="pc-bnaam" data-id="'+r.id+'" value="'+r.naam+'" placeholder="Paginanaam" style="width:100%;font-size:12px;border:1px solid var(--border);border-radius:4px;padding:4px 7px;background:var(--white);"></td>'+
+        '<td><input type="text" class="pc-bkw1" data-id="'+r.id+'" value="'+r.kw1+'" placeholder="Primair" style="width:100%;font-size:12px;border:1px solid var(--border);border-radius:4px;padding:4px 7px;background:var(--white);"></td>'+
+        '<td><input type="text" class="pc-bkw2" data-id="'+r.id+'" value="'+r.kw2+'" placeholder="Secundair" style="width:100%;font-size:12px;border:1px solid var(--border);border-radius:4px;padding:4px 7px;background:var(--white);"></td>'+
+        '<td><input type="text" class="pc-bkws" data-id="'+r.id+'" value="'+r.kws+'" placeholder="Ondersteunend" style="width:100%;font-size:12px;border:1px solid var(--border);border-radius:4px;padding:4px 7px;background:var(--white);"></td>'+
+      '</tr>';
+    }).join('')+'</tbody></table>';
+}
+function pcBulk2Wishlist(){
+  document.querySelectorAll('.pc-bnaam').forEach(function(inp){
+    var id=parseFloat(inp.getAttribute('data-id'));
+    var r=pcBulkData.filter(function(x){return x.id===id;})[0]; if(!r) return;
+    r.naam=inp.value.trim();
+  });
+  document.querySelectorAll('.pc-bkw1').forEach(function(inp){
+    var id=parseFloat(inp.getAttribute('data-id'));
+    var r=pcBulkData.filter(function(x){return x.id===id;})[0]; if(!r) return;
+    r.kw1=inp.value.trim();
+  });
+  document.querySelectorAll('.pc-bkw2').forEach(function(inp){
+    var id=parseFloat(inp.getAttribute('data-id'));
+    var r=pcBulkData.filter(function(x){return x.id===id;})[0]; if(!r) return;
+    r.kw2=inp.value.trim();
+  });
+  document.querySelectorAll('.pc-bkws').forEach(function(inp){
+    var id=parseFloat(inp.getAttribute('data-id'));
+    var r=pcBulkData.filter(function(x){return x.id===id;})[0]; if(!r) return;
+    r.kws=inp.value.trim();
+  });
+  pcBulkData.forEach(function(r){pcWishlist.push({id:r.id,naam:r.naam,url:r.url,kw1:r.kw1,kw2:r.kw2,kws:r.kws,status:'wachtend'});});
+  pcResetBulk();
+  pcRenderWishlist();
+  pcTab(3);
+  toast(pcBulkData.length+' items naar wishlist.','t-ok');
+  pcBulkData=[];
+}
+function pcRenderWishlist(){
+  var el=document.getElementById('pc-wlt');
+  var cnt=document.getElementById('pc-wlcnt');
+  var nc=document.getElementById('nc-pcwishlist');
+  var rb=document.getElementById('pc-runbtn');
+  if(cnt) cnt.textContent=pcWishlist.length;
+  if(nc)  nc.textContent=pcWishlist.length;
+  if(rb)  rb.disabled=!pcWishlist.length;
+  if(!pcWishlist.length){
+    el.innerHTML='<div class="empty"><svg viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/></svg><h3>Wishlist is leeg</h3><p>Voeg aanvragen toe via Enkelvoudig of Bulk import.</p></div>';
     return;
   }
-  el.innerHTML = '<table><thead><tr><th>Datum</th><th>Functiegroep</th><th>Sector</th><th>Locatie</th><th>Zoekterm</th><th>Status</th><th></th></tr></thead><tbody>' +
-    functieprofielen.map(function(p) {
-      return '<tr>' +
-        '<td class="mono">' + p.date + '</td>' +
-        '<td><div style="font-weight:500;">' + p.titel + '</div>' + (p.slug ? '<div class="mono">' + p.slug + '</div>' : '') + '</td>' +
-        '<td>' + (p.sector || '-') + '</td>' +
-        '<td>' + (p.locatie || '-') + '</td>' +
-        '<td>' + (p.kw1 || '-') + '</td>' +
-        '<td><span class="badge ' + (p.status === 'klaar' ? 'b-gr' : 'b-bl') + '">' + p.status + '</span></td>' +
-        '<td><button class="btn b-dn bsm fp-rm-btn" data-id="' + p.id + '"><svg viewBox="0 0 24 24" style="width:12px;height:12px;stroke:currentColor;stroke-width:2;fill:none;"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></td>' +
+  el.innerHTML='<table><thead><tr><th>Paginanaam</th><th>URL</th><th>Primaire zoekterm</th><th>Status</th><th></th></tr></thead><tbody>'+
+    pcWishlist.map(function(r){
+      return '<tr>'+
+        '<td style="font-weight:500;">'+r.naam+'</td>'+
+        '<td class="mono" style="font-size:11px;">'+r.url+'</td>'+
+        '<td>'+r.kw1+'</td>'+
+        '<td><span class="badge b-bl">'+r.status+'</span></td>'+
+        '<td><button class="btn b-dn bsm pc-wl-rm" data-id="'+r.id+'"><svg viewBox="0 0 24 24" style="width:12px;height:12px;stroke:currentColor;stroke-width:2;fill:none;"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></td>'+
       '</tr>';
-    }).join('') +
-  '</tbody></table>';
-  el.querySelectorAll('.fp-rm-btn').forEach(function(btn) {
-    btn.addEventListener('click', function() { rmFP(parseFloat(btn.getAttribute('data-id'))); });
+    }).join('')+'</tbody></table>';
+  el.querySelectorAll('.pc-wl-rm').forEach(function(btn){
+    btn.addEventListener('click',function(){
+      var id=parseFloat(btn.getAttribute('data-id'));
+      pcWishlist=pcWishlist.filter(function(r){return r.id!==id;});
+      pcRenderWishlist();
+    });
   });
 }
-
-function rmFP(id) {
-  functieprofielen = functieprofielen.filter(function(p) { return p.id !== id; });
-  rFP();
+function pcRunBot(){
+  if(!pcWishlist.length){toast('Wishlist is leeg.','t-err');return;}
+  toast('Bot gestart voor '+pcWishlist.length+' item(s). Webhook vereist.','t-ok');
+}
+function pcExport(){
+  if(!pcReviews.length){toast('Geen resultaten om te exporteren.','t-err');return;}
+  var rows=pcReviews.map(function(r){
+    return '"'+r.naam+'","'+r.url+'","'+r.kw1+'","'+r.status+'"';
+  });
+  var csv=['Paginanaam,URL,Zoekterm,Status'].concat(rows).join('\n');
+  var a=document.createElement('a');
+  a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);
+  a.download='productcategorie.csv'; a.click();
 }
 
-function fpExp() {
-  if (!functieprofielen.length) { toast('Geen profielen om te exporteren.', 't-err'); return; }
-  var rows = functieprofielen.map(function(p) {
-    return '"'+p.date+'","'+p.titel+'","'+(p.sector||'')+'","'+(p.locatie||'')+'","'+p.kw1+'","'+p.status+'"';
+// META CHECKER
+var mckData = [];
+function mckRun(){
+  var raw=document.getElementById('mck-urls').value.trim();
+  if(!raw){toast('Voer eerst URLs in.','t-err');return;}
+  var lines=raw.split('\n').map(function(l){return l.trim();}).filter(Boolean);
+  mckData=lines.map(function(url){
+    return {url:url, titel:'', beschrijving:''};
   });
-  var csv = ['Datum,Functiegroep,Sector,Locatie,Zoekterm,Status'].concat(rows).join('\n');
-  var a = document.createElement('a');
-  a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
-  a.download = 'functieprofielen.csv';
-  a.click();
+  document.getElementById('mck-rcnt').textContent=mckData.length;
+  document.getElementById('mck-uc').textContent=lines.length+' URLs';
+  mckRenderReview();
+  mckTab(2);
+  toast(lines.length+' URLs klaar voor analyse. Webhook vereist.','t-ok');
+}
+function mckRenderReview(){
+  var el=document.getElementById('mck-review');
+  if(!mckData.length){
+    el.innerHTML='<div class="empty"><svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/></svg><h3>Nog geen URLs geanalyseerd</h3></div>';
+    return;
+  }
+  el.innerHTML='<table><thead><tr><th>URL</th><th>Titel</th><th>Beschrijving</th></tr></thead><tbody>'+
+    mckData.map(function(r){
+      return '<tr>'+
+        '<td class="mono" style="font-size:11px;">'+r.url+'</td>'+
+        '<td style="color:var(--muted);font-style:italic;">'+(r.titel||'—')+'</td>'+
+        '<td style="color:var(--muted);font-style:italic;">'+(r.beschrijving||'—')+'</td>'+
+      '</tr>';
+    }).join('')+'</tbody></table>';
+}
+function mckExport(){
+  if(!mckData.length){toast('Geen data om te exporteren.','t-err');return;}
+  var rows=mckData.map(function(r){return '"'+r.url+'","'+r.titel+'","'+r.beschrijving+'"';});
+  var csv=['URL,Titel,Beschrijving'].concat(rows).join('\n');
+  var a=document.createElement('a'); a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);
+  a.download='meta-checker.csv'; a.click();
+}
+
+// META WRITER
+var mwrData = [];
+function mwrRun(){
+  var raw=document.getElementById('mwr-urls').value.trim();
+  if(!raw){toast('Voer eerst URLs in.','t-err');return;}
+  var lines=raw.split('\n').map(function(l){return l.trim();}).filter(Boolean);
+  mwrData=lines.map(function(url){
+    return {url:url, nwTitel:'', nwBeschrijving:'', huidigeTitel:'', huidigeBeschrijving:''};
+  });
+  document.getElementById('mwr-rcnt').textContent=mwrData.length;
+  document.getElementById('mwr-uc').textContent=lines.length+' URLs';
+  mwrRenderReview();
+  mwrTab(2);
+  toast(lines.length+' URLs klaar voor generatie. Webhook vereist.','t-ok');
+}
+function mwrRenderReview(){
+  var el=document.getElementById('mwr-review');
+  if(!mwrData.length){
+    el.innerHTML='<div class="empty"><svg viewBox="0 0 24 24"><path d="M12 20h9"/></svg><h3>Nog geen meta gegenereerd</h3></div>';
+    return;
+  }
+  el.innerHTML='<table><thead><tr><th>URL</th><th>Nieuwe Titel</th><th>Nieuwe Beschrijving</th><th>Huidige Titel</th><th>Huidige Beschrijving</th></tr></thead><tbody>'+
+    mwrData.map(function(r){
+      return '<tr>'+
+        '<td class="mono" style="font-size:11px;">'+r.url+'</td>'+
+        '<td style="color:var(--muted);font-style:italic;">'+(r.nwTitel||'—')+'</td>'+
+        '<td style="color:var(--muted);font-style:italic;">'+(r.nwBeschrijving||'—')+'</td>'+
+        '<td style="color:var(--muted);font-style:italic;">'+(r.huidigeTitel||'—')+'</td>'+
+        '<td style="color:var(--muted);font-style:italic;">'+(r.huidigeBeschrijving||'—')+'</td>'+
+      '</tr>';
+    }).join('')+'</tbody></table>';
+}
+function mwrExport(){
+  if(!mwrData.length){toast('Geen data om te exporteren.','t-err');return;}
+  var rows=mwrData.map(function(r){return '"'+r.url+'","'+r.nwTitel+'","'+r.nwBeschrijving+'","'+r.huidigeTitel+'","'+r.huidigeBeschrijving+'"';});
+  var csv=['URL,Nieuwe Titel,Nieuwe Beschrijving,Huidige Titel,Huidige Beschrijving'].concat(rows).join('\n');
+  var a=document.createElement('a'); a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);
+  a.download='meta-writer.csv'; a.click();
 }
 
 // HUISSTIJL
