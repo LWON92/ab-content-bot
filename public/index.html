@@ -225,6 +225,21 @@ tr:hover td{background:var(--off);}
 .modal-sub{font-size:12.5px;color:var(--muted);margin-bottom:16px;}
 .modal-foot{display:flex;justify-content:flex-end;gap:7px;margin-top:16px;padding-top:14px;border-top:1px solid var(--border);}
 
+.uz{border:2px dashed var(--border);border-radius:var(--rl);padding:22px 14px;text-align:center;cursor:pointer;transition:border-color .15s,background .15s;background:var(--off);margin-bottom:10px;}
+.uz:hover,.uz.drag{border-color:var(--bdk);background:#F4FAFF;}
+.uz svg{width:22px;height:22px;stroke:var(--mgray);stroke-width:1.5;fill:none;stroke-linecap:round;stroke-linejoin:round;margin:0 auto 8px;display:block;}
+.uz.drag svg{stroke:var(--bdk);}
+.uz-lbl{display:block;font-size:12.5px;font-weight:500;color:var(--muted);margin-bottom:3px;}
+.uz-hint{font-size:10.5px;color:var(--mgray);}
+.flist{display:flex;flex-direction:column;gap:5px;margin-top:2px;}
+.fitem{display:flex;align-items:center;gap:8px;padding:6px 9px;background:var(--off);border:1px solid var(--border);border-radius:var(--rm);font-size:12px;}
+.fitem-ic{width:13px;height:13px;stroke:var(--bdk);stroke-width:1.8;fill:none;flex-shrink:0;}
+.fitem-nm{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--body);}
+.fitem-sz{font-size:10.5px;color:var(--muted);flex-shrink:0;}
+.fitem-rm{background:none;border:none;cursor:pointer;color:var(--mgray);padding:2px 4px;border-radius:3px;line-height:0;transition:color .1s;}
+.fitem-rm:hover{color:var(--red);}
+.fitem-rm svg{width:11px;height:11px;stroke:currentColor;stroke-width:2;fill:none;display:block;}
+
 /* TOAST */
 .toast{position:fixed;bottom:20px;right:20px;background:var(--black);color:var(--white);padding:10px 15px;border-radius:var(--rl);font-size:12.5px;font-weight:500;display:none;align-items:center;gap:9px;z-index:9999;box-shadow:var(--s3);max-width:340px;}
 .toast.show{display:flex;}
@@ -270,6 +285,10 @@ tr:hover td{background:var(--off);}
       Vacatureteksten
     </div>
     <div class="nav-grp">Beheer</div>
+    <div class="ni" onclick="go(this,'huisstijl')">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+      Huisstijl &amp; Stijlgids
+    </div>
     <div class="ni" onclick="go(this,'users')">
       <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
       Gebruikers
@@ -566,6 +585,112 @@ tr:hover td{background:var(--off);}
       </div>
     </div>
 
+    <!-- HUISSTIJL -->
+    <div id="panel-huisstijl" class="panel">
+      <div class="ph"><h1>Huisstijl &amp; Stijl</h1><p>Upload documenten die de AI gebruikt als basis voor tone of voice en schrijfstijl</p></div>
+      <div class="itabs">
+        <div class="itab active" id="hst-1" onclick="hsTab(1)">
+          <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          Documenten
+        </div>
+        <div class="itab" id="hst-2" onclick="hsTab(2)">
+          <svg viewBox="0 0 24 24"><line x1="17" y1="10" x2="3" y2="10"/><line x1="21" y1="6" x2="3" y2="6"/><line x1="21" y1="14" x2="3" y2="14"/><line x1="17" y1="18" x2="3" y2="18"/></svg>
+          Schrijfregels
+        </div>
+      </div>
+
+      <div id="hs-tab1">
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:18px;">
+
+          <div class="card" style="margin-bottom:0;">
+            <div class="ct"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>Huisstijl</div>
+            <p style="font-size:12px;color:var(--muted);margin-bottom:12px;line-height:1.6;">Brandgids, kleurenpalet, typografie en visuele identiteit.</p>
+            <div class="uz" id="uz-hs" ondragover="uzOver(event)" ondragleave="uzOut(event)" ondrop="uzDrop(event,'hs')" onclick="document.getElementById('fi-hs').click()">
+              <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              <span class="uz-lbl">Klik of sleep bestand</span>
+              <span class="uz-hint">PDF, DOCX, PNG, JPG</span>
+            </div>
+            <input type="file" id="fi-hs" style="display:none;" accept=".pdf,.doc,.docx,.png,.jpg,.jpeg" multiple onchange="uzPick(this,'hs')">
+            <div class="flist" id="fl-hs"></div>
+          </div>
+
+          <div class="card" style="margin-bottom:0;">
+            <div class="ct"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Tone of Voice</div>
+            <p style="font-size:12px;color:var(--muted);margin-bottom:12px;line-height:1.6;">Communicatierichtlijnen, schrijfstijl en do's &amp; don'ts.</p>
+            <div class="uz" id="uz-tov" ondragover="uzOver(event)" ondragleave="uzOut(event)" ondrop="uzDrop(event,'tov')" onclick="document.getElementById('fi-tov').click()">
+              <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              <span class="uz-lbl">Klik of sleep bestand</span>
+              <span class="uz-hint">PDF, DOCX, TXT</span>
+            </div>
+            <input type="file" id="fi-tov" style="display:none;" accept=".pdf,.doc,.docx,.txt" multiple onchange="uzPick(this,'tov')">
+            <div class="flist" id="fl-tov"></div>
+          </div>
+
+          <div class="card" style="margin-bottom:0;">
+            <div class="ct"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Voorbeeldteksten</div>
+            <p style="font-size:12px;color:var(--muted);margin-bottom:12px;line-height:1.6;">Eerder geschreven content als referentie voor woordkeuze en stijl.</p>
+            <div class="uz" id="uz-vbt" ondragover="uzOver(event)" ondragleave="uzOut(event)" ondrop="uzDrop(event,'vbt')" onclick="document.getElementById('fi-vbt').click()">
+              <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              <span class="uz-lbl">Klik of sleep bestand</span>
+              <span class="uz-hint">PDF, DOCX, TXT</span>
+            </div>
+            <input type="file" id="fi-vbt" style="display:none;" accept=".pdf,.doc,.docx,.txt" multiple onchange="uzPick(this,'vbt')">
+            <div class="flist" id="fl-vbt"></div>
+          </div>
+
+        </div>
+
+        <div class="sh">
+          <div class="stt">Geüploade documenten <span class="scnt" id="hs-cnt">0</span></div>
+          <button class="btn b-dn bsm" id="hs-clr-btn" style="display:none;" onclick="hsClrAll()">
+            <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+            Alles verwijderen
+          </button>
+        </div>
+        <div class="tw" id="hs-tbl">
+          <div class="empty">
+            <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            <h3>Nog geen documenten geüpload</h3>
+            <p>Upload documenten via de kaarten hierboven.</p>
+          </div>
+        </div>
+      </div>
+
+      <div id="hs-tab2" style="display:none;">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+          <div>
+            <div class="card">
+              <div class="ct"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Do's — Wel doen</div>
+              <p style="font-size:12px;color:var(--muted);margin-bottom:10px;line-height:1.6;">Schrijfregels die de AI moet volgen.</p>
+              <textarea id="hs-dos" style="width:100%;min-height:180px;border:1px solid var(--border);border-radius:var(--rm);padding:10px;font-family:var(--font);font-size:13px;resize:vertical;outline:none;line-height:1.6;" placeholder="bijv. schrijf in de jij-vorm, gebruik actieve zinnen, houd alineas kort..." onfocus="this.style.borderColor='var(--bdk)'" onblur="this.style.borderColor='var(--border)'"></textarea>
+            </div>
+            <div class="card">
+              <div class="ct"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="8" y1="12" x2="16" y2="12"/></svg>Verboden woorden</div>
+              <textarea id="hs-verboden" style="width:100%;min-height:100px;border:1px solid var(--border);border-radius:var(--rm);padding:10px;font-family:var(--font);font-size:13px;resize:vertical;outline:none;line-height:1.6;" placeholder="bijv. synergieën, proactief, out-of-the-box, faciliteren..." onfocus="this.style.borderColor='var(--bdk)'" onblur="this.style.borderColor='var(--border)'"></textarea>
+            </div>
+          </div>
+          <div>
+            <div class="card">
+              <div class="ct"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>Don'ts — Niet doen</div>
+              <p style="font-size:12px;color:var(--muted);margin-bottom:10px;line-height:1.6;">Stijlfouten die de AI moet vermijden.</p>
+              <textarea id="hs-donts" style="width:100%;min-height:180px;border:1px solid var(--border);border-radius:var(--rm);padding:10px;font-family:var(--font);font-size:13px;resize:vertical;outline:none;line-height:1.6;" placeholder="bijv. geen u-vorm, geen jargon zonder uitleg, geen passieve zinnen..." onfocus="this.style.borderColor='var(--bdk)'" onblur="this.style.borderColor='var(--border)'"></textarea>
+            </div>
+            <div class="card">
+              <div class="ct"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Toon &amp; karakter</div>
+              <textarea id="hs-toon" style="width:100%;min-height:100px;border:1px solid var(--border);border-radius:var(--rm);padding:10px;font-family:var(--font);font-size:13px;resize:vertical;outline:none;line-height:1.6;" placeholder="Omschrijf de merkpersoonlijkheid. Hoe klinkt het merk? Wat voor gevoel moet tekst overbrengen?" onfocus="this.style.borderColor='var(--bdk)'" onblur="this.style.borderColor='var(--border)'"></textarea>
+            </div>
+          </div>
+        </div>
+        <div class="brow" style="justify-content:flex-end;margin-top:6px;">
+          <button class="btn b-gh" onclick="hsClear()">Leegmaken</button>
+          <button class="btn b-k" onclick="hsSave()">
+            <svg viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+            Schrijfregels opslaan
+          </button>
+        </div>
+      </div>
+    </div>
+
     <!-- GEBRUIKERS -->
     <div id="panel-users" class="panel">
       <div class="sh" style="margin-bottom:18px;">
@@ -697,7 +822,7 @@ var users=[
 
 var panelLabels={
   'dashboard':'Dashboard','content-bot':'Content Bot','content-data':'Content Data',
-  'meta-bot':'Meta Bot','meta-data':'Meta Data','vacatures':'Vacatureteksten','users':'Gebruikers','settings':'Instellingen'
+  'meta-bot':'Meta Bot','meta-data':'Meta Data','vacatures':'Vacatureteksten','huisstijl':'Huisstijl & Stijl','users':'Gebruikers','settings':'Instellingen'
 };
 
 // NAVIGATION
@@ -956,6 +1081,118 @@ function tv(id,btn){
   var el=document.getElementById(id);if(!el)return;
   var isPass=el.type==='password';
   el.type=isPass?'text':'password';
+}
+
+// HUISSTIJL
+var hsDocs = {hs:[], tov:[], vbt:[]};
+var hsLabels = {hs:'Huisstijl', tov:'Tone of Voice', vbt:'Voorbeeldteksten'};
+
+function hsTab(n) {
+  [1,2].forEach(function(i) {
+    document.getElementById('hst-'+i).classList.toggle('active', i===n);
+    document.getElementById('hs-tab'+i).style.display = i===n ? 'block' : 'none';
+  });
+}
+
+function uzOver(e) { e.preventDefault(); e.currentTarget.classList.add('drag'); }
+function uzOut(e)  { e.currentTarget.classList.remove('drag'); }
+function uzDrop(e, cat) { e.preventDefault(); e.currentTarget.classList.remove('drag'); hsAddFiles(e.dataTransfer.files, cat); }
+function uzPick(inp, cat) { hsAddFiles(inp.files, cat); inp.value=''; }
+
+function hsFmt(b) {
+  if(b < 1024) return b+'B';
+  if(b < 1048576) return Math.round(b/1024)+'KB';
+  return (b/1048576).toFixed(1)+'MB';
+}
+
+function hsAddFiles(files, cat) {
+  var added = 0;
+  Array.from(files).forEach(function(f) {
+    hsDocs[cat].push({id: Date.now() + Math.random(), name: f.name, size: hsFmt(f.size), cat: cat});
+    added++;
+  });
+  hsRender();
+  toast(added + ' bestand' + (added !== 1 ? 'en' : '') + ' toegevoegd.', 't-ok');
+}
+
+function hsRemove(cat, id) {
+  hsDocs[cat] = hsDocs[cat].filter(function(f) { return f.id !== id; });
+  hsRender();
+}
+
+function hsRender() {
+  // Per-categorie lijsten
+  ['hs','tov','vbt'].forEach(function(cat) {
+    var el = document.getElementById('fl-'+cat);
+    if (!el) return;
+    if (!hsDocs[cat].length) { el.innerHTML = ''; return; }
+    el.innerHTML = hsDocs[cat].map(function(f) {
+      return '<div class="fitem">' +
+        '<svg class="fitem-ic" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>' +
+        '<span class="fitem-nm">' + f.name + '</span>' +
+        '<span class="fitem-sz">' + f.size + '</span>' +
+        '<button class="fitem-rm" data-cat="' + f.cat + '" data-id="' + f.id + '">' +
+          '<svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>' +
+        '</button>' +
+      '</div>';
+    }).join('');
+    el.querySelectorAll('.fitem-rm').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        hsRemove(btn.getAttribute('data-cat'), parseFloat(btn.getAttribute('data-id')));
+      });
+    });
+  });
+
+  // Totaaloverzicht tabel
+  var all = hsDocs.hs.concat(hsDocs.tov).concat(hsDocs.vbt);
+  var cnt = document.getElementById('hs-cnt');
+  if (cnt) cnt.textContent = all.length;
+  var clrBtn = document.getElementById('hs-clr-btn');
+  if (clrBtn) clrBtn.style.display = all.length ? 'flex' : 'none';
+
+  var tbl = document.getElementById('hs-tbl');
+  if (!tbl) return;
+  if (!all.length) {
+    tbl.innerHTML = '<div class="empty"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg><h3>Nog geen documenten geüpload</h3><p>Upload documenten via de kaarten hierboven.</p></div>';
+    return;
+  }
+  tbl.innerHTML = '<table><thead><tr><th>Bestandsnaam</th><th>Categorie</th><th>Grootte</th><th></th></tr></thead><tbody>' +
+    all.map(function(f) {
+      return '<tr>' +
+        '<td><div style="display:flex;align-items:center;gap:8px;">' +
+          '<svg style="width:13px;height:13px;stroke:var(--bdk);stroke-width:1.8;fill:none;flex-shrink:0;" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>' +
+          f.name +
+        '</div></td>' +
+        '<td><span class="badge b-bl">' + hsLabels[f.cat] + '</span></td>' +
+        '<td class="mono">' + f.size + '</td>' +
+        '<td><button class="btn b-dn bsm fitem-rm" data-cat="' + f.cat + '" data-id="' + f.id + '">' +
+          '<svg viewBox="0 0 24 24" style="width:12px;height:12px;stroke:currentColor;stroke-width:2;fill:none;"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>' +
+        '</button></td>' +
+      '</tr>';
+    }).join('') +
+  '</tbody></table>';
+  tbl.querySelectorAll('.fitem-rm').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      hsRemove(btn.getAttribute('data-cat'), parseFloat(btn.getAttribute('data-id')));
+    });
+  });
+}
+
+function hsClrAll() {
+  if (!confirm('Alle documenten verwijderen?')) return;
+  hsDocs = {hs:[], tov:[], vbt:[]};
+  hsRender();
+  toast('Alle documenten verwijderd.', 't-ok');
+}
+
+function hsClear() {
+  ['hs-dos','hs-donts','hs-verboden','hs-toon'].forEach(function(id) {
+    var e = document.getElementById(id); if (e) e.value = '';
+  });
+}
+
+function hsSave() {
+  toast('Schrijfregels opgeslagen.', 't-ok');
 }
 
 // VACATURE TABS
