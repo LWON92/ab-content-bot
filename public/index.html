@@ -898,9 +898,11 @@ function b2list(){
   toast(v.length+' URL\'s toegevoegd aan de wishlist.','t-ok');
 }
 
-document.getElementById('bi').addEventListener('input',function(){
+// URL teller voor pc-bi bulk input
+var pcBiEl = document.getElementById('pc-bi');
+if(pcBiEl) pcBiEl.addEventListener('input',function(){
   var n=this.value.split('\n').filter(function(l){return l.trim();}).length;
-  document.getElementById('uc').textContent=n?n+' URL\'s gevonden':'';
+  document.getElementById('pc-uc').textContent=n?n+' URLs gevonden':'';
 });
 
 // WISHLIST
