@@ -284,6 +284,10 @@ tr:hover td{background:var(--off);}
       <svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><line x1="12" y1="12" x2="12" y2="16"/><line x1="10" y1="14" x2="14" y2="14"/></svg>
       Vacatureteksten
     </div>
+    <div class="ni" onclick="go(this,'functieprofielen')">
+      <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      Functieprofielen
+    </div>
     <div class="nav-grp">Beheer</div>
     <div class="ni" onclick="go(this,'huisstijl')">
       <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
@@ -585,6 +589,88 @@ tr:hover td{background:var(--off);}
       </div>
     </div>
 
+    <!-- FUNCTIEPROFIELEN -->
+    <div id="panel-functieprofielen" class="panel">
+      <div class="ph"><h1>Functieprofielen</h1><p>Schrijf evergreen landingspagina's voor functiegroepen om talent aan te trekken</p></div>
+      <div class="itabs">
+        <div class="itab active" id="fp-1" onclick="fpTab(1)">
+          <svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>Nieuw profiel
+        </div>
+        <div class="itab" id="fp-2" onclick="fpTab(2)">
+          <svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>Overzicht
+        </div>
+      </div>
+
+      <div id="fp-tab1">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+
+          <div>
+            <div class="card">
+              <div class="ct"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>Functiegroep &amp; doelgroep</div>
+              <div class="fg" style="margin-bottom:10px;"><label class="lbl">Functiegroep / paginatitel *</label><input type="text" id="fp-titel" placeholder="bijv. Customer Service Medewerkers"><span class="hint">Dit wordt de H1 van de landingspagina</span></div>
+              <div class="fg" style="margin-bottom:10px;"><label class="lbl">URL / Slug</label><input type="text" id="fp-slug" placeholder="bijv. /werken-bij/customer-service"></div>
+              <div class="fg" style="margin-bottom:10px;"><label class="lbl">Sector / Branche</label><input type="text" id="fp-sector" placeholder="bijv. E-commerce, Logistiek, Retail"></div>
+              <div class="fg"><label class="lbl">Doelgroep omschrijving *</label><textarea id="fp-doelgroep" placeholder="Wie wil je aanspreken? Ervaringsniveau, achtergrond, motivatie, levensfase…" style="min-height:90px;"></textarea></div>
+            </div>
+            <div class="card">
+              <div class="ct"><svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Werkomgeving</div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
+                <div class="fg"><label class="lbl">Locatie(s)</label><input type="text" id="fp-locatie" placeholder="bijv. Heel Nederland / Amsterdam"></div>
+                <div class="fg"><label class="lbl">Werkmodel</label><select id="fp-werkmodel"><option value="op-kantoor">Op kantoor</option><option value="hybride" selected>Hybride</option><option value="remote">Volledig remote</option><option value="wisselend">Wisselende locaties</option></select></div>
+              </div>
+              <div class="fg"><label class="lbl">Sfeer &amp; cultuur</label><textarea id="fp-sfeer" placeholder="Hoe is het werken in deze rol? Informeel, dynamisch, zelfstandig…" style="min-height:70px;"></textarea></div>
+            </div>
+            <div class="card">
+              <div class="ct"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>SEO &amp; CTA</div>
+              <div class="fg" style="margin-bottom:10px;"><label class="lbl">Primaire zoekterm *</label><input type="text" id="fp-kw1" placeholder="bijv. klantenservice medewerker vacature"><span class="hint">Hoofdzoekterm voor de pagina</span></div>
+              <div class="fg" style="margin-bottom:10px;"><label class="lbl">Secundaire zoektermen</label><input type="text" id="fp-kw2" placeholder="bijv. klantenservice amsterdam, klantcontact werk"></div>
+              <div class="fg"><label class="lbl">Call-to-action</label><select id="fp-cta"><option value="vacatures">Bekijk onze openstaande vacatures</option><option value="solliciteer">Solliciteer direct open</option><option value="contact">Neem contact op</option><option value="aanmelden">Meld je aan voor job alerts</option><option value="eigen">Eigen CTA (zie extra context)</option></select></div>
+            </div>
+          </div>
+
+          <div>
+            <div class="card">
+              <div class="ct"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/></svg>Pagina-inhoud</div>
+              <div class="fg" style="margin-bottom:10px;"><label class="lbl">Introductietekst / Hook *</label><textarea id="fp-intro" placeholder="Wat maakt deze functiegroep bijzonder? Spreek de bezoeker direct aan." style="min-height:80px;"></textarea></div>
+              <div class="fg" style="margin-bottom:10px;"><label class="lbl">Wat houdt dit werk in?</label><textarea id="fp-werk" placeholder="Algemene omschrijving van de werkzaamheden — niet functie-specifiek maar als rode draad voor de hele groep." style="min-height:80px;"></textarea></div>
+              <div class="fg" style="margin-bottom:10px;"><label class="lbl">Wat maakt jullie aantrekkelijk als werkgever?</label><textarea id="fp-usp" placeholder="USP's voor deze doelgroep: ontwikkelkansen, cultuur, arbeidsvoorwaarden, maatschappelijke impact…" style="min-height:75px;"></textarea></div>
+              <div class="fg"><label class="lbl">Groeipaden &amp; doorgroeimogelijkheden</label><textarea id="fp-groei" placeholder="Welke stappen kan iemand in deze functiegroep zetten? Specialiseren, teamlead, intern doorgroeien…" style="min-height:70px;"></textarea></div>
+            </div>
+            <div class="card">
+              <div class="ct"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Profiel &amp; stijl</div>
+              <div class="fg" style="margin-bottom:10px;"><label class="lbl">Vereiste achtergrond (algemeen)</label><textarea id="fp-achtergrond" placeholder="Welke achtergrond of houding past bij deze functiegroep? Denk breed, niet als strikte eisen." style="min-height:65px;"></textarea></div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
+                <div class="fg"><label class="lbl">Tone of Voice</label><select id="fp-ton"><option value="informeel" selected>Informeel &amp; direct</option><option value="professioneel">Professioneel</option><option value="inspirerend">Inspirerend</option><option value="zakelijk">Zakelijk &amp; formeel</option></select></div>
+                <div class="fg"><label class="lbl">Taal</label><select id="fp-taal"><option value="nl" selected>Nederlands</option><option value="en">Engels</option></select></div>
+              </div>
+              <div class="fg"><label class="lbl">Extra context voor de AI</label><textarea id="fp-ctx" placeholder="Aanvullende informatie of specifieke wensen…" style="min-height:50px;"></textarea></div>
+            </div>
+            <div class="brow" style="justify-content:flex-end;margin-top:4px;">
+              <button class="btn b-gh" onclick="clrFP()">Leegmaken</button>
+              <button class="btn b-k" style="font-size:13px;padding:9px 18px;" onclick="addFP()">
+                <svg viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>Functieprofiel genereren
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <div id="fp-tab2" style="display:none;">
+        <div class="sh">
+          <div class="stt">Gegenereerde profielen <span class="scnt" id="fp-cnt">0</span></div>
+          <button class="btn b-gh" onclick="fpExp()"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>CSV exporteren</button>
+        </div>
+        <div class="tw" id="fp-list">
+          <div class="empty">
+            <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            <h3>Nog geen functieprofielen gegenereerd</h3>
+            <p>Vul het formulier in en genereer je eerste functieprofiel pagina.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- HUISSTIJL -->
     <div id="panel-huisstijl" class="panel">
       <div class="ph"><h1>Huisstijl &amp; Stijl</h1><p>Upload documenten die de AI gebruikt als basis voor tone of voice en schrijfstijl</p></div>
@@ -822,7 +908,7 @@ var users=[
 
 var panelLabels={
   'dashboard':'Dashboard','content-bot':'Content Bot','content-data':'Content Data',
-  'meta-bot':'Meta Bot','meta-data':'Meta Data','vacatures':'Vacatureteksten','huisstijl':'Huisstijl & Stijl','users':'Gebruikers','settings':'Instellingen'
+  'meta-bot':'Meta Bot','meta-data':'Meta Data','vacatures':'Vacatureteksten','functieprofielen':'Functieprofielen','huisstijl':'Huisstijl & Stijl','users':'Gebruikers','settings':'Instellingen'
 };
 
 // NAVIGATION
@@ -1081,6 +1167,103 @@ function tv(id,btn){
   var el=document.getElementById(id);if(!el)return;
   var isPass=el.type==='password';
   el.type=isPass?'text':'password';
+}
+
+// FUNCTIEPROFIELEN
+var functieprofielen = [];
+
+function fpTab(n) {
+  [1,2].forEach(function(i) {
+    document.getElementById('fp-'+i).classList.toggle('active', i===n);
+    document.getElementById('fp-tab'+i).style.display = i===n ? 'block' : 'none';
+  });
+}
+
+function clrFP() {
+  ['fp-titel','fp-slug','fp-sector','fp-doelgroep','fp-locatie','fp-sfeer',
+   'fp-kw1','fp-kw2','fp-intro','fp-werk','fp-usp','fp-groei','fp-achtergrond','fp-ctx']
+  .forEach(function(id) { var e = document.getElementById(id); if (e) e.value = ''; });
+  var wm = document.getElementById('fp-werkmodel'); if (wm) wm.selectedIndex = 1;
+  var tn = document.getElementById('fp-ton'); if (tn) tn.selectedIndex = 0;
+  var tl = document.getElementById('fp-taal'); if (tl) tl.selectedIndex = 0;
+  var ct = document.getElementById('fp-cta'); if (ct) ct.selectedIndex = 0;
+}
+
+function addFP() {
+  var titel = document.getElementById('fp-titel').value.trim();
+  var doel  = document.getElementById('fp-doelgroep').value.trim();
+  var intro = document.getElementById('fp-intro').value.trim();
+  var kw1   = document.getElementById('fp-kw1').value.trim();
+  if (!titel || !doel || !intro || !kw1) {
+    toast('Vul minimaal Functiegroep, Doelgroep, Introductietekst en Primaire zoekterm in.', 't-err');
+    return;
+  }
+  var p = {
+    id: Date.now(), titel: titel,
+    slug: document.getElementById('fp-slug').value.trim(),
+    sector: document.getElementById('fp-sector').value.trim(),
+    doelgroep: doel,
+    locatie: document.getElementById('fp-locatie').value.trim(),
+    werkmodel: document.getElementById('fp-werkmodel').value,
+    sfeer: document.getElementById('fp-sfeer').value.trim(),
+    kw1: kw1, kw2: document.getElementById('fp-kw2').value.trim(),
+    cta: document.getElementById('fp-cta').value,
+    intro: intro,
+    werk: document.getElementById('fp-werk').value.trim(),
+    usp: document.getElementById('fp-usp').value.trim(),
+    groei: document.getElementById('fp-groei').value.trim(),
+    achtergrond: document.getElementById('fp-achtergrond').value.trim(),
+    ton: document.getElementById('fp-ton').value,
+    taal: document.getElementById('fp-taal').value,
+    ctx: document.getElementById('fp-ctx').value.trim(),
+    status: 'wachtend', date: new Date().toLocaleDateString('nl-NL')
+  };
+  functieprofielen.push(p);
+  rFP(); fpTab(2);
+  toast('Functieprofiel toegevoegd. Bot wordt gestart zodra webhook is ingesteld.', 't-ok');
+}
+
+function rFP() {
+  var el = document.getElementById('fp-list');
+  var cnt = document.getElementById('fp-cnt');
+  if (cnt) cnt.textContent = functieprofielen.length;
+  if (!functieprofielen.length) {
+    el.innerHTML = '<div class="empty"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg><h3>Nog geen functieprofielen gegenereerd</h3><p>Vul het formulier in en genereer je eerste functieprofiel pagina.</p></div>';
+    return;
+  }
+  el.innerHTML = '<table><thead><tr><th>Datum</th><th>Functiegroep</th><th>Sector</th><th>Locatie</th><th>Zoekterm</th><th>Status</th><th></th></tr></thead><tbody>' +
+    functieprofielen.map(function(p) {
+      return '<tr>' +
+        '<td class="mono">' + p.date + '</td>' +
+        '<td><div style="font-weight:500;">' + p.titel + '</div>' + (p.slug ? '<div class="mono">' + p.slug + '</div>' : '') + '</td>' +
+        '<td>' + (p.sector || '-') + '</td>' +
+        '<td>' + (p.locatie || '-') + '</td>' +
+        '<td>' + (p.kw1 || '-') + '</td>' +
+        '<td><span class="badge ' + (p.status === 'klaar' ? 'b-gr' : 'b-bl') + '">' + p.status + '</span></td>' +
+        '<td><button class="btn b-dn bsm fp-rm-btn" data-id="' + p.id + '"><svg viewBox="0 0 24 24" style="width:12px;height:12px;stroke:currentColor;stroke-width:2;fill:none;"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></td>' +
+      '</tr>';
+    }).join('') +
+  '</tbody></table>';
+  el.querySelectorAll('.fp-rm-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() { rmFP(parseFloat(btn.getAttribute('data-id'))); });
+  });
+}
+
+function rmFP(id) {
+  functieprofielen = functieprofielen.filter(function(p) { return p.id !== id; });
+  rFP();
+}
+
+function fpExp() {
+  if (!functieprofielen.length) { toast('Geen profielen om te exporteren.', 't-err'); return; }
+  var rows = functieprofielen.map(function(p) {
+    return '"'+p.date+'","'+p.titel+'","'+(p.sector||'')+'","'+(p.locatie||'')+'","'+p.kw1+'","'+p.status+'"';
+  });
+  var csv = ['Datum,Functiegroep,Sector,Locatie,Zoekterm,Status'].concat(rows).join('\n');
+  var a = document.createElement('a');
+  a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
+  a.download = 'functieprofielen.csv';
+  a.click();
 }
 
 // HUISSTIJL
