@@ -264,6 +264,11 @@ tr:hover td{background:var(--off);}
       <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
       Meta Data
     </div>
+    <div class="nav-grp">Recruitment</div>
+    <div class="ni" onclick="go(this,'vacatures')">
+      <svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><line x1="12" y1="12" x2="12" y2="16"/><line x1="10" y1="14" x2="14" y2="14"/></svg>
+      Vacatureteksten
+    </div>
     <div class="nav-grp">Beheer</div>
     <div class="ni" onclick="go(this,'users')">
       <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
@@ -479,6 +484,88 @@ tr:hover td{background:var(--off);}
       <div class="tw"><div class="empty"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg><h3>Geen meta data beschikbaar</h3><p>Start een Meta Bot Writer run om resultaten te zien.</p></div></div>
     </div>
 
+    <!-- VACATURETEKSTEN -->
+    <div id="panel-vacatures" class="panel">
+      <div class="ph"><h1>Vacatureteksten</h1><p>Genereer professionele vacatureteksten op basis van jouw input</p></div>
+
+      <div class="itabs">
+        <div class="itab active" id="vt-1" onclick="vtTab(1)">
+          <svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>Schrijven
+        </div>
+        <div class="itab" id="vt-2" onclick="vtTab(2)">
+          <svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>Overzicht
+        </div>
+      </div>
+
+      <!-- TAB 1: SCHRIJVEN -->
+      <div id="vt-tab1">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+
+          <!-- LINKER KOLOM -->
+          <div>
+            <div class="card">
+              <div class="ct"><svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><line x1="12" y1="12" x2="12" y2="16"/><line x1="10" y1="14" x2="14" y2="14"/></svg>Basisgegevens</div>
+              <div class="fg" style="margin-bottom:10px;"><label class="lbl">Functietitel *</label><input type="text" id="vt-titel" placeholder="bijv. Customer Service Medewerker"></div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
+                <div class="fg"><label class="lbl">Locatie *</label><input type="text" id="vt-loc" placeholder="bijv. Amsterdam / Hybrid"></div>
+                <div class="fg"><label class="lbl">Aantal uren *</label><input type="text" id="vt-uren" placeholder="bijv. 32–40 uur per week"></div>
+              </div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
+                <div class="fg"><label class="lbl">Salarisrange</label><input type="text" id="vt-sal" placeholder="bijv. €2.800 – €3.500"></div>
+                <div class="fg"><label class="lbl">Soort contract</label><select id="vt-contract"><option value="vast">Vast contract</option><option value="tijdelijk">Tijdelijk contract</option><option value="tijdelijk-uitzicht">Tijdelijk met uitzicht op vast</option><option value="freelance">Freelance / ZZP</option><option value="stage">Stage</option></select></div>
+              </div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
+                <div class="fg"><label class="lbl">Opleidingsniveau</label><select id="vt-opl"><option value="vmbo">VMBO</option><option value="mbo">MBO</option><option value="hbo" selected>HBO</option><option value="wo">WO</option><option value="hbo-wo">HBO / WO</option><option value="geen">Geen vereiste</option></select></div>
+                <div class="fg"><label class="lbl">Reageren voor</label><input type="text" id="vt-datum" placeholder="bijv. 1 april 2026"></div>
+              </div>
+              <div class="fg"><label class="lbl">Contactpersoon</label><input type="text" id="vt-contact" placeholder="bijv. Lisa de Vries — l.devries@bosta.nl"></div>
+            </div>
+
+            <div class="card">
+              <div class="ct"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>Teamomschrijving</div>
+              <div class="fg"><textarea id="vt-team" placeholder="Beschrijf het team: grootte, sfeer, hoe het samenwerkt, de positie van deze rol binnen het team…" style="min-height:100px;"></textarea></div>
+            </div>
+          </div>
+
+          <!-- RECHTER KOLOM -->
+          <div>
+            <div class="card">
+              <div class="ct"><svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>Vacaturetekst inhoud</div>
+              <div class="fg" style="margin-bottom:10px;"><label class="lbl">Introductietekst / Vacaturehook *</label><textarea id="vt-intro" placeholder="De openingszin of alinea die de lezer direct triggert. Wat maakt deze vacature bijzonder?" style="min-height:80px;"></textarea></div>
+              <div class="fg" style="margin-bottom:10px;"><label class="lbl">Wat ga je doen? *</label><textarea id="vt-doen" placeholder="Beschrijf de dagelijkse werkzaamheden en verantwoordelijkheden…" style="min-height:90px;"></textarea></div>
+              <div class="fg" style="margin-bottom:10px;"><label class="lbl">Wat bieden wij?</label><textarea id="vt-bieden" placeholder="Arbeidsvoorwaarden, groeimogelijkheden, cultuur, voordelen…" style="min-height:80px;"></textarea></div>
+              <div class="fg"><label class="lbl">Wat vragen we van jou? *</label><textarea id="vt-vragen" placeholder="Vereiste vaardigheden, ervaring, opleiding, persoonlijkheid…" style="min-height:80px;"></textarea></div>
+            </div>
+
+            <div class="brow" style="justify-content:flex-end;margin-top:4px;">
+              <button class="btn b-gh" onclick="clrVT()">Leegmaken</button>
+              <button class="btn b-k" style="font-size:13px;padding:9px 18px;" onclick="addVT()">
+                <svg viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                Vacaturetekst genereren
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 2: OVERZICHT -->
+      <div id="vt-tab2" style="display:none;">
+        <div class="sh">
+          <div class="stt">Gegenereerde vacatures <span class="scnt" id="vt-cnt">0</span></div>
+          <button class="btn b-gh" onclick="vtExp()">
+            <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>CSV exporteren
+          </button>
+        </div>
+        <div class="tw" id="vt-list">
+          <div class="empty">
+            <svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>
+            <h3>Nog geen vacatures gegenereerd</h3>
+            <p>Vul het formulier in en genereer je eerste vacaturetekst.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- GEBRUIKERS -->
     <div id="panel-users" class="panel">
       <div class="sh" style="margin-bottom:18px;">
@@ -610,7 +697,7 @@ var users=[
 
 var panelLabels={
   'dashboard':'Dashboard','content-bot':'Content Bot','content-data':'Content Data',
-  'meta-bot':'Meta Bot','meta-data':'Meta Data','users':'Gebruikers','settings':'Instellingen'
+  'meta-bot':'Meta Bot','meta-data':'Meta Data','vacatures':'Vacatureteksten','users':'Gebruikers','settings':'Instellingen'
 };
 
 // NAVIGATION
@@ -869,6 +956,89 @@ function tv(id,btn){
   var el=document.getElementById(id);if(!el)return;
   var isPass=el.type==='password';
   el.type=isPass?'text':'password';
+}
+
+// VACATURE TABS
+function vtTab(n){
+  [1,2].forEach(function(i){
+    document.getElementById('vt-'+i).classList.toggle('active',i===n);
+    document.getElementById('vt-tab'+i).style.display=i===n?'block':'none';
+  });
+}
+
+// VACATURE STATE
+var vacatures=[];
+
+function clrVT(){
+  ['vt-titel','vt-loc','vt-uren','vt-sal','vt-datum','vt-contact','vt-team','vt-intro','vt-doen','vt-bieden','vt-vragen'].forEach(function(id){
+    var e=document.getElementById(id); if(e) e.value='';
+  });
+  var c=document.getElementById('vt-contract'); if(c) c.selectedIndex=0;
+  var o=document.getElementById('vt-opl'); if(o) o.selectedIndex=2;
+}
+
+function addVT(){
+  var titel=document.getElementById('vt-titel').value.trim();
+  var intro=document.getElementById('vt-intro').value.trim();
+  var doen=document.getElementById('vt-doen').value.trim();
+  var vragen=document.getElementById('vt-vragen').value.trim();
+  if(!titel||!intro||!doen||!vragen){toast('Vul minimaal Functietitel, Introductietekst, Wat ga je doen en Wat vragen we in.','t-err');return;}
+  var v={
+    id:Date.now(),
+    titel:titel,
+    loc:document.getElementById('vt-loc').value.trim(),
+    uren:document.getElementById('vt-uren').value.trim(),
+    sal:document.getElementById('vt-sal').value.trim(),
+    contract:document.getElementById('vt-contract').value,
+    opl:document.getElementById('vt-opl').value,
+    datum:document.getElementById('vt-datum').value.trim(),
+    contact:document.getElementById('vt-contact').value.trim(),
+    team:document.getElementById('vt-team').value.trim(),
+    intro:intro,
+    doen:doen,
+    bieden:document.getElementById('vt-bieden').value.trim(),
+    vragen:vragen,
+    status:'wachtend',
+    date:new Date().toLocaleDateString('nl-NL')
+  };
+  vacatures.push(v);
+  rVT();
+  vtTab(2);
+  toast('Vacature toegevoegd. Bot wordt gestart zodra webhook is ingesteld.','t-ok');
+}
+
+function rVT(){
+  var el=document.getElementById('vt-list');
+  var cnt=document.getElementById('vt-cnt');
+  if(cnt) cnt.textContent=vacatures.length;
+  if(!vacatures.length){
+    el.innerHTML='<div class="empty"><svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg><h3>Nog geen vacatures gegenereerd</h3><p>Vul het formulier in en genereer je eerste vacaturetekst.</p></div>';
+    return;
+  }
+  el.innerHTML='<table><thead><tr><th>Datum</th><th>Functietitel</th><th>Locatie</th><th>Uren</th><th>Contract</th><th>Reageren voor</th><th>Status</th><th></th></tr></thead><tbody>'+
+    vacatures.map(function(v){
+      return '<tr>'+
+        '<td class="mono">'+v.date+'</td>'+
+        '<td><div style="font-weight:500;">'+v.titel+'</div></td>'+
+        '<td>'+(v.loc||'—')+'</td>'+
+        '<td>'+(v.uren||'—')+'</td>'+
+        '<td><span class="badge b-gy">'+v.contract+'</span></td>'+
+        '<td class="mono">'+(v.datum||'—')+'</td>'+
+        '<td><span class="badge '+(v.status==='klaar'?'b-gr':'b-bl')+'">'+v.status+'</span></td>'+
+        '<td><button class="btn b-dn bsm" onclick="rmVT('+v.id+')"><svg viewBox="0 0 24 24" style="width:12px;height:12px;stroke:currentColor;stroke-width:2;fill:none;"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></td>'+
+        '</tr>';
+    }).join('')+
+    '</tbody></table>';
+}
+
+function rmVT(id){vacatures=vacatures.filter(function(v){return v.id!==id;});rVT();}
+
+function vtExp(){
+  if(!vacatures.length){toast('Geen vacatures om te exporteren.','t-err');return;}
+  var csv=['Datum,Functietitel,Locatie,Uren,Contract,Reageren voor,Status'].concat(
+    vacatures.map(function(v){return '"'+v.date+'","'+v.titel+'","'+(v.loc||'')+'","'+(v.uren||'')+'","'+v.contract+'","'+(v.datum||'')+'","'+v.status+'"';})
+  ).join('\n');
+  var a=document.createElement('a');a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);a.download='vacatures.csv';a.click();
 }
 
 // INIT
