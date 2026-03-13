@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Arthur &amp; Brent — AI Content Bot</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -251,6 +252,72 @@ tr:hover td{background:var(--off);}
 </head>
 <body>
 
+
+<!-- ════════════════════════════════════════════════
+     LOGIN SCHERM
+════════════════════════════════════════════════ -->
+<div id="login-screen" style="
+  position:fixed;inset:0;background:var(--black);
+  display:flex;align-items:center;justify-content:center;
+  z-index:9000;flex-direction:column;gap:0;
+">
+  <div style="width:380px;">
+
+    <!-- Logo -->
+    <div style="text-align:center;margin-bottom:32px;">
+      <img id="login-logo" alt="Arthur & Brent" style="height:42px;width:auto;filter:invert(1) brightness(1.8);">
+      <div style="margin-top:10px;font-size:10px;font-weight:600;letter-spacing:2.5px;text-transform:uppercase;color:var(--brand);">AI Content Bot</div>
+    </div>
+
+    <!-- Card -->
+    <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:28px 28px 24px;">
+
+      <!-- Stap 1: e-mailadres -->
+      <div id="login-step1">
+        <div style="font-size:17px;font-weight:600;color:var(--white);letter-spacing:-.3px;margin-bottom:4px;">Inloggen</div>
+        <div style="font-size:12.5px;color:rgba(255,255,255,.4);margin-bottom:20px;">Voer je e-mailadres in om een inloglink te ontvangen.</div>
+        <div style="display:flex;flex-direction:column;gap:4px;margin-bottom:14px;">
+          <label style="font-size:10.5px;font-weight:600;color:rgba(255,255,255,.35);text-transform:uppercase;letter-spacing:.5px;">E-mailadres</label>
+          <input type="email" id="login-email" placeholder="naam@bedrijf.nl" style="
+            background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);
+            border-radius:8px;padding:10px 12px;font-family:var(--font);font-size:13px;
+            color:var(--white);outline:none;transition:border-color .13s;
+          " onfocus="this.style.borderColor='var(--brand)'" onblur="this.style.borderColor='rgba(255,255,255,.1)'"
+          onkeydown="if(event.key==='Enter')sendMagicLink()">
+        </div>
+        <button onclick="sendMagicLink()" id="login-btn" style="
+          width:100%;background:var(--brand);color:var(--black);border:none;
+          border-radius:8px;padding:11px;font-family:var(--font);font-size:13px;
+          font-weight:600;cursor:pointer;transition:background .13s;
+        " onmouseover="this.style.background='#a8d9f5'" onmouseout="this.style.background='var(--brand)'">
+          Stuur inloglink
+        </button>
+        <div id="login-err" style="display:none;margin-top:10px;font-size:12px;color:#e74c3c;text-align:center;"></div>
+      </div>
+
+      <!-- Stap 2: bevestiging -->
+      <div id="login-step2" style="display:none;text-align:center;">
+        <div style="width:48px;height:48px;background:rgba(187,227,250,.1);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
+          <svg viewBox="0 0 24 24" style="width:22px;height:22px;stroke:var(--brand);stroke-width:1.8;fill:none;stroke-linecap:round;stroke-linejoin:round;"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        </div>
+        <div style="font-size:16px;font-weight:600;color:var(--white);margin-bottom:6px;">Check je inbox</div>
+        <div id="login-sent-email" style="font-size:12.5px;color:rgba(255,255,255,.4);line-height:1.6;"></div>
+        <button onclick="backToStep1()" style="
+          margin-top:18px;background:transparent;border:1px solid rgba(255,255,255,.12);
+          border-radius:8px;padding:8px 16px;font-family:var(--font);font-size:12px;
+          color:rgba(255,255,255,.4);cursor:pointer;
+        ">Ander e-mailadres</button>
+      </div>
+
+    </div>
+
+    <div style="text-align:center;margin-top:16px;font-size:11px;color:rgba(255,255,255,.18);">
+      &copy; Arthur &amp; Brent — Alleen toegang voor uitgenodigde gebruikers
+    </div>
+  </div>
+</div>
+<!-- ════ EINDE LOGIN SCHERM ════ -->
+
 <aside class="sb">
   <div class="sb-logo">
     <img id="logo-img" alt="Arthur &amp; Brent">
@@ -369,7 +436,7 @@ tr:hover td{background:var(--off);}
           <span class="nc" id="nc-pcwl" style="background:var(--lgray);color:var(--muted);">0</span>
         </div>
         <div class="itab" id="pc-3" onclick="pcTab(3)">
-          <svg viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>Wishlist
+          <svg viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>Wachtrij
           <span class="nc" id="nc-pcwishlist" style="background:var(--lgray);color:var(--muted);">0</span>
         </div>
         <div class="itab" id="pc-4" onclick="pcTab(4)">
@@ -410,7 +477,7 @@ tr:hover td{background:var(--off);}
             <div class="stt">Bewerk details per URL <span class="scnt" id="pc-bcnt">0</span></div>
             <div class="brow">
               <button class="btn b-gh bsm" onclick="pcResetBulk()">Nieuwe import</button>
-              <button class="btn b-k" onclick="pcBulk2Wishlist()"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Alles naar wishlist</button>
+              <button class="btn b-k" onclick="pcBulk2Wishlist()"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Alles naar wachtrij</button>
             </div>
           </div>
           <div class="btwrap" id="pc-btbl"></div>
@@ -420,13 +487,13 @@ tr:hover td{background:var(--off);}
       <!-- TAB 3: WISHLIST -->
       <div id="pc-tab3" style="display:none;">
         <div class="sh">
-          <div class="stt">Wishlist <span class="scnt" id="pc-wlcnt">0</span></div>
+          <div class="stt">Wachtrij <span class="scnt" id="pc-wlcnt">0</span></div>
           <button class="btn b-k" id="pc-runbtn" onclick="pcRunBot()" disabled>
             <svg viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>Verwerken met bot
           </button>
         </div>
         <div class="tw" id="pc-wlt">
-          <div class="empty"><svg viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/></svg><h3>Wishlist is leeg</h3><p>Voeg aanvragen toe via Enkelvoudig of Bulk import.</p></div>
+          <div class="empty"><svg viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/></svg><h3>Wachtrij is leeg</h3><p>Voeg aanvragen toe via Enkelvoudig of Bulk import.</p></div>
         </div>
       </div>
 
@@ -450,6 +517,10 @@ tr:hover td{background:var(--off);}
           <svg viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>Bulk
         </div>
         <div class="itab" id="mck-2" onclick="mckTab(2)">
+          <svg viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>Wachtrij
+          <span class="nc" id="nc-mckq" style="background:var(--lgray);color:var(--muted);">0</span>
+        </div>
+        <div class="itab" id="mck-3" onclick="mckTab(3)">
           <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Review
         </div>
       </div>
@@ -466,14 +537,27 @@ tr:hover td{background:var(--off);}
         </div>
       </div>
 
-      <!-- MCK TAB 2: REVIEW -->
+      <!-- MCK TAB 2: WACHTRIJ -->
       <div id="mck-tab2" style="display:none;">
+        <div class="sh">
+          <div class="stt">Wachtrij <span class="scnt" id="mck-qcnt">0</span></div>
+          <button class="btn b-k" id="mck-runbtn" onclick="mckRunBot()" disabled>
+            <svg viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>Analyseren met bot
+          </button>
+        </div>
+        <div class="tw" id="mck-queue">
+          <div class="empty"><svg viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/></svg><h3>Wachtrij is leeg</h3><p>Voer URL's in via het Bulk tabblad om te starten.</p></div>
+        </div>
+      </div>
+
+      <!-- MCK TAB 3: REVIEW -->
+      <div id="mck-tab3" style="display:none;">
         <div class="sh">
           <div class="stt">Geanalyseerde URL's <span class="scnt" id="mck-rcnt">0</span></div>
           <button class="btn b-gh" onclick="mckExport()"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>CSV exporteren</button>
         </div>
         <div class="tw" id="mck-review">
-          <div class="empty"><svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg><h3>Nog geen URL's geanalyseerd</h3><p>Voer URL's in via het Bulk tabblad om resultaten te zien.</p></div>
+          <div class="empty"><svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg><h3>Nog geen URL's geanalyseerd</h3><p>Verwerk de wachtrij om resultaten te zien.</p></div>
         </div>
         <p style="font-size:12px;color:var(--muted);margin-top:10px;">Kolommen: URL | Huidige Titel | Huidige Beschrijving</p>
       </div>
@@ -487,6 +571,10 @@ tr:hover td{background:var(--off);}
           <svg viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>Bulk
         </div>
         <div class="itab" id="mwr-2" onclick="mwrTab(2)">
+          <svg viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>Wachtrij
+          <span class="nc" id="nc-mwrq" style="background:var(--lgray);color:var(--muted);">0</span>
+        </div>
+        <div class="itab" id="mwr-3" onclick="mwrTab(3)">
           <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Review
         </div>
       </div>
@@ -503,14 +591,27 @@ tr:hover td{background:var(--off);}
         </div>
       </div>
 
-      <!-- MWR TAB 2: REVIEW -->
+      <!-- MWR TAB 2: WACHTRIJ -->
       <div id="mwr-tab2" style="display:none;">
+        <div class="sh">
+          <div class="stt">Wachtrij <span class="scnt" id="mwr-qcnt">0</span></div>
+          <button class="btn b-k" id="mwr-runbtn" onclick="mwrRunBot()" disabled>
+            <svg viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>Genereren met bot
+          </button>
+        </div>
+        <div class="tw" id="mwr-queue">
+          <div class="empty"><svg viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/></svg><h3>Wachtrij is leeg</h3><p>Voer URL's in via het Bulk tabblad om te starten.</p></div>
+        </div>
+      </div>
+
+      <!-- MWR TAB 3: REVIEW -->
+      <div id="mwr-tab3" style="display:none;">
         <div class="sh">
           <div class="stt">Gegenereerde meta <span class="scnt" id="mwr-rcnt">0</span></div>
           <button class="btn b-gh" onclick="mwrExport()"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>CSV exporteren</button>
         </div>
         <div class="tw" id="mwr-review">
-          <div class="empty"><svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg><h3>Nog geen meta gegenereerd</h3><p>Voer URL's in via het Bulk tabblad om resultaten te zien.</p></div>
+          <div class="empty"><svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg><h3>Nog geen meta gegenereerd</h3><p>Verwerk de wachtrij om resultaten te zien.</p></div>
         </div>
         <p style="font-size:12px;color:var(--muted);margin-top:10px;">Kolommen: URL | Nieuwe Titel | Nieuwe Beschrijving | Huidige Titel | Huidige Beschrijving</p>
       </div>
@@ -784,13 +885,13 @@ function pcTab(n){
   });
 }
 function mckTab(n){
-  [1,2].forEach(function(i){
+  [1,2,3].forEach(function(i){
     document.getElementById('mck-'+i).classList.toggle('active',i===n);
     document.getElementById('mck-tab'+i).style.display=i===n?'block':'none';
   });
 }
 function mwrTab(n){
-  [1,2].forEach(function(i){
+  [1,2,3].forEach(function(i){
     document.getElementById('mwr-'+i).classList.toggle('active',i===n);
     document.getElementById('mwr-tab'+i).style.display=i===n?'block':'none';
   });
@@ -914,7 +1015,7 @@ function rWL(){
   var btn=document.getElementById('runbtn'); if(btn)btn.disabled=!n;
   var el=document.getElementById('wlt');
   if(!wl.length){
-    el.innerHTML='<div class="empty"><svg viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/></svg><h3>Wishlist is leeg</h3><p>Voeg aanvragen toe via Enkelvoudig of Bulk import.</p></div>';
+    el.innerHTML='<div class="empty"><svg viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/></svg><h3>Wachtrij is leeg</h3><p>Voeg aanvragen toe via Enkelvoudig of Bulk import.</p></div>';
     return;
   }
   el.innerHTML='<table><thead><tr><th>#</th><th>Pagina</th><th>Zoekterm</th><th>Type</th><th>Status</th><th></th></tr></thead><tbody>'+
@@ -1032,7 +1133,7 @@ function pcBulk2Wishlist(){
   pcResetBulk();
   pcRenderWishlist();
   pcTab(3);
-  toast(pcBulkData.length+' items naar wishlist.','t-ok');
+  toast(pcBulkData.length+' items naar wachtrij.','t-ok');
   pcBulkData=[];
 }
 function pcRenderWishlist(){
@@ -1044,7 +1145,7 @@ function pcRenderWishlist(){
   if(nc)  nc.textContent=pcWishlist.length;
   if(rb)  rb.disabled=!pcWishlist.length;
   if(!pcWishlist.length){
-    el.innerHTML='<div class="empty"><svg viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/></svg><h3>Wishlist is leeg</h3><p>Voeg aanvragen toe via Enkelvoudig of Bulk import.</p></div>';
+    el.innerHTML='<div class="empty"><svg viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/></svg><h3>Wachtrij is leeg</h3><p>Voeg aanvragen toe via Enkelvoudig of Bulk import.</p></div>';
     return;
   }
   el.innerHTML='<table><thead><tr><th>Paginanaam</th><th>URL</th><th>Primaire zoekterm</th><th>Status</th><th></th></tr></thead><tbody>'+
@@ -1066,7 +1167,7 @@ function pcRenderWishlist(){
   });
 }
 function pcRunBot(){
-  if(!pcWishlist.length){toast('Wishlist is leeg.','t-err');return;}
+  if(!pcWishlist.length){toast('Wachtrij is leeg.','t-err');return;}
   toast('Bot gestart voor '+pcWishlist.length+' item(s). Webhook vereist.','t-ok');
 }
 function pcExport(){
@@ -1092,6 +1193,7 @@ function mckRun(){
   document.getElementById('mck-rcnt').textContent=mckData.length;
   document.getElementById('mck-uc').textContent=lines.length+' URLs';
   mckRenderReview();
+  mckRenderQueue();
   mckTab(2);
   toast(lines.length+' URLs klaar voor analyse. Webhook vereist.','t-ok');
 }
@@ -1118,6 +1220,32 @@ function mckExport(){
   a.download='meta-checker.csv'; a.click();
 }
 
+
+function mckRenderQueue(){
+  var el=document.getElementById('mck-queue');
+  var cnt=document.getElementById('mck-qcnt');
+  var nc=document.getElementById('nc-mckq');
+  var rb=document.getElementById('mck-runbtn');
+  if(cnt) cnt.textContent=mckData.length;
+  if(nc)  nc.textContent=mckData.length;
+  if(rb)  rb.disabled=!mckData.length;
+  if(!el) return;
+  if(!mckData.length){
+    el.innerHTML='<div class="empty"><svg viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/></svg><h3>Wachtrij is leeg</h3><p>Voer URLs in via het Bulk tabblad om te starten.</p></div>';
+    return;
+  }
+  el.innerHTML='<table><thead><tr><th>URL</th><th>Status</th></tr></thead><tbody>'+
+    mckData.map(function(r){
+      return '<tr>'+
+        '<td class="mono" style="font-size:11px;">'+r.url+'</td>'+
+        '<td><span class="badge b-bl">wachtend</span></td>'+
+      '</tr>';
+    }).join('')+'</tbody></table>';
+}
+function mckRunBot(){
+  if(!mckData.length){toast('Wachtrij is leeg.','t-err');return;}
+  toast('Bot gestart voor '+mckData.length+' URL(s). Webhook vereist.','t-ok');
+}
 // META WRITER
 var mwrData = [];
 function mwrRun(){
@@ -1130,6 +1258,7 @@ function mwrRun(){
   document.getElementById('mwr-rcnt').textContent=mwrData.length;
   document.getElementById('mwr-uc').textContent=lines.length+' URLs';
   mwrRenderReview();
+  mwrRenderQueue();
   mwrTab(2);
   toast(lines.length+' URLs klaar voor generatie. Webhook vereist.','t-ok');
 }
@@ -1158,6 +1287,32 @@ function mwrExport(){
   a.download='meta-writer.csv'; a.click();
 }
 
+
+function mwrRenderQueue(){
+  var el=document.getElementById('mwr-queue');
+  var cnt=document.getElementById('mwr-qcnt');
+  var nc=document.getElementById('nc-mwrq');
+  var rb=document.getElementById('mwr-runbtn');
+  if(cnt) cnt.textContent=mwrData.length;
+  if(nc)  nc.textContent=mwrData.length;
+  if(rb)  rb.disabled=!mwrData.length;
+  if(!el) return;
+  if(!mwrData.length){
+    el.innerHTML='<div class="empty"><svg viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/></svg><h3>Wachtrij is leeg</h3><p>Voer URLs in via het Bulk tabblad om te starten.</p></div>';
+    return;
+  }
+  el.innerHTML='<table><thead><tr><th>URL</th><th>Status</th></tr></thead><tbody>'+
+    mwrData.map(function(r){
+      return '<tr>'+
+        '<td class="mono" style="font-size:11px;">'+r.url+'</td>'+
+        '<td><span class="badge b-bl">wachtend</span></td>'+
+      '</tr>';
+    }).join('')+'</tbody></table>';
+}
+function mwrRunBot(){
+  if(!mwrData.length){toast('Wachtrij is leeg.','t-err');return;}
+  toast('Bot gestart voor '+mwrData.length+' URL(s). Webhook vereist.','t-ok');
+}
 // HUISSTIJL
 var hsDocs = {hs:[], tov:[], vbt:[]};
 var hsLabels = {hs:'Huisstijl', tov:'Tone of Voice', vbt:'Voorbeeldteksten'};
@@ -1432,6 +1587,170 @@ function sWH(){
   if(m) wh.meta=m.value.trim();
   toast('Webhook URLs opgeslagen.','t-ok');
 }
+
+
+// ════════════════════════════════════════════════
+//  SUPABASE AUTH
+// ════════════════════════════════════════════════
+
+var _supabase = null;
+var _currentUser = null;
+var _currentProfile = null;
+
+// Initialiseer Supabase zodra config beschikbaar is
+function initSupabase(url, anon) {
+  _supabase = supabase.createClient(url, anon);
+  checkSession();
+}
+
+// Haal config op van server en start auth
+fetch('/api/config')
+  .then(function(r){ return r.json(); })
+  .then(function(cfg){ initSupabase(cfg.supabaseUrl, cfg.supabaseAnon); })
+  .catch(function(e){ console.error('Config ophalen mislukt:', e); });
+
+// ── Check of er al een sessie is ──
+function checkSession() {
+  _supabase.auth.getSession().then(function(result) {
+    var session = result.data.session;
+    if (session) {
+      loadProfile(session.access_token);
+    }
+    // Luister naar auth state changes (o.a. na magic link klik)
+    _supabase.auth.onAuthStateChange(function(event, session) {
+      if (event === 'SIGNED_IN' && session) {
+        loadProfile(session.access_token);
+      }
+      if (event === 'SIGNED_OUT') {
+        showLoginScreen();
+      }
+    });
+  });
+}
+
+// ── Laad gebruikersprofiel van onze eigen users tabel ──
+function loadProfile(token) {
+  fetch('/api/me', {
+    headers: { 'Authorization': 'Bearer ' + token }
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(data) {
+    if (data.error) {
+      showLoginErr('Je account is nog niet gekoppeld aan een klant. Neem contact op met lars@arthurbrent.nl');
+      return;
+    }
+    _currentProfile = data.user;
+    applyProfile(data.user);
+    hideLoginScreen();
+  })
+  .catch(function(e){
+    console.error('Profiel laden mislukt:', e);
+    showLoginErr('Er ging iets mis. Probeer opnieuw.');
+  });
+}
+
+// ── Pas UI aan op basis van profiel ──
+function applyProfile(profile) {
+  // Klantnaam in topbar
+  var cname = document.getElementById('cname');
+  var cav   = document.getElementById('cav');
+  if (cname && profile.clients) cname.textContent = profile.clients.name;
+  if (cav   && profile.clients) cav.textContent   = profile.clients.initials;
+
+  // Verberg owner-only elementen voor niet-owners
+  if (profile.role !== 'owner') {
+    var ownerEls = document.querySelectorAll('.owner-only');
+    ownerEls.forEach(function(el){ el.style.display = 'none'; });
+  }
+
+  // Verberg beheer-menu voor viewers
+  if (profile.role === 'viewer') {
+    var memberEls = document.querySelectorAll('.member-only');
+    memberEls.forEach(function(el){ el.style.display = 'none'; });
+  }
+}
+
+// ── Magic link versturen ──
+function sendMagicLink() {
+  var email = document.getElementById('login-email').value.trim();
+  if (!email) {
+    showLoginErr('Voer een e-mailadres in.');
+    return;
+  }
+  var btn = document.getElementById('login-btn');
+  btn.textContent = 'Versturen…';
+  btn.disabled = true;
+
+  _supabase.auth.signInWithOtp({
+    email: email,
+    options: {
+      shouldCreateUser: false  // Alleen bestaande gebruikers mogen inloggen
+    }
+  }).then(function(result) {
+    if (result.error) {
+      showLoginErr(result.error.message === 'Signups not allowed for otp'
+        ? 'Dit e-mailadres is niet uitgenodigd. Neem contact op met lars@arthurbrent.nl'
+        : result.error.message
+      );
+      btn.textContent = 'Stuur inloglink';
+      btn.disabled = false;
+      return;
+    }
+    // Toon bevestigingsscherm
+    document.getElementById('login-step1').style.display = 'none';
+    document.getElementById('login-step2').style.display = 'block';
+    document.getElementById('login-sent-email').innerHTML =
+      'We hebben een inloglink gestuurd naar<br><strong style="color:var(--white);">' + email + '</strong><br><br>Klik op de link in de e-mail om in te loggen.';
+  });
+}
+
+function backToStep1() {
+  document.getElementById('login-step1').style.display = 'block';
+  document.getElementById('login-step2').style.display = 'none';
+  document.getElementById('login-email').value = '';
+  document.getElementById('login-err').style.display = 'none';
+  var btn = document.getElementById('login-btn');
+  btn.textContent = 'Stuur inloglink';
+  btn.disabled = false;
+}
+
+function showLoginErr(msg) {
+  var err = document.getElementById('login-err');
+  err.textContent = msg;
+  err.style.display = 'block';
+}
+
+// ── Uitloggen ──
+function logout() {
+  if (_supabase) _supabase.auth.signOut();
+}
+
+// ── Show/hide login screen ──
+function hideLoginScreen() {
+  var ls = document.getElementById('login-screen');
+  if (ls) ls.style.display = 'none';
+}
+
+function showLoginScreen() {
+  var ls = document.getElementById('login-screen');
+  if (ls) ls.style.display = 'flex';
+  backToStep1();
+}
+
+// Logo ook op loginscherm tonen
+(function() {
+  var img = document.getElementById('login-logo');
+  if (img) img.src = document.getElementById('logo-img') ? document.getElementById('logo-img').src : '';
+  // Wacht tot logo geladen is via IIFE
+  var checkLogo = setInterval(function() {
+    var src = document.getElementById('logo-img') ? document.getElementById('logo-img').src : '';
+    if (src && src.length > 100) {
+      if (img) img.src = src;
+      clearInterval(checkLogo);
+    }
+  }, 100);
+})();
+
 
 // INIT
 updS();
