@@ -2060,18 +2060,7 @@ function testWH(type){
 
   var labels={'productcategorie':'Productcategorie','meta-checker':'Meta Checker','meta-writer':'Meta Writer'};
 
-  fetch(url,{
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({
-      test:true,
-      type:type,
-      source:'AB Content Bot — Webhook Test',
-      label:labels[type]||type,
-      client_id:_activeClientId,
-      ts:new Date().toISOString()
-    })
-  })
+  apiCall('POST','/api/webhooks/'+type+'/test')
   .then(function(r){
     if(btn){
       btn.disabled=false;

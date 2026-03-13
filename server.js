@@ -623,6 +623,43 @@ app.get('/api/webhooks/:type', requireAuth, async (req, res) => {
 // ════════════════════════════════════════════════
 //  SPA CATCH-ALL
 // ════════════════════════════════════════════════
+
+// POST /api/webhooks/:type/test — test webhook via server (omzeilt CORS)
+app.post('/api/webhooks/:type/test', requireAuth, requireSuperadmin, async (req, res) => {
+  if (!WEBHOOK_TYPES.includes(req.params.type)) {
+    return res.status(400).json({ error: 'Ongeldig webhook type' });
+  }
+  const { data, error } = await db
+    .from('webhooks')
+    .select('url, is_active')
+    .eq('client_id', req.clientId)
+    .eq('type', req.params.type)
+    .single();
+
+  if (error || !data || !data.url) {
+    return res.status(400).json({ error: 'Geen webhook URL ingesteld voor dit type' });
+  }
+
+  const labels = { 'productcategorie': 'Productcategorie', 'meta-checker': 'Meta Checker', 'meta-writer': 'Meta Writer' };
+  try {
+    const response = await fetch(data.url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        test: true,
+        type: req.params.type,
+        source: 'AB Content Bot — Webhook Test',
+        label: labels[req.params.type] || req.params.type,
+        client_id: req.clientId,
+        ts: new Date().toISOString()
+      }),
+      signal: AbortSignal.timeout(10000)
+    });
+    res.json({ ok: response.ok, status: response.status });
+  } catch (err) {
+    res.status(502).json({ ok: false, error: err.message || 'Kon webhook niet bereiken' });
+  }
+});
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
