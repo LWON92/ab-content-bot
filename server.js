@@ -221,7 +221,7 @@ app.post('/api/invitations', requireAuth, requireOwner, async (req, res) => {
 
   // Genereer magic link via Supabase
   const { data: linkData, error: linkError } = await db.auth.admin.generateLink({
-    type: 'magiclink',
+    type: 'invite',
     email,
     options: { redirectTo: appUrl }
   });
@@ -275,7 +275,7 @@ app.post('/api/invitations/:id/resend', requireAuth, requireOwner, async (req, r
 
   // Nieuwe magic link genereren
   const { data: linkData, error: linkError } = await db.auth.admin.generateLink({
-    type: 'magiclink',
+    type: 'invite',
     email: inv.email,
     options: { redirectTo: appUrl }
   });

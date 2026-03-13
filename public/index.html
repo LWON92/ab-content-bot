@@ -1739,16 +1739,41 @@ fetch('/api/config')
   .then(function(cfg){ initSupabase(cfg.supabaseUrl, cfg.supabaseAnon); })
   .catch(function(e){ console.error('Config ophalen mislukt:', e); });
 
+// ── Check URL hash op errors (verlopen/ongeldige links) ──
+function checkHashError() {
+  var hash = window.location.hash;
+  if (!hash) return false;
+  var params = {};
+  hash.replace('#','').split('&').forEach(function(part) {
+    var kv = part.split('=');
+    params[decodeURIComponent(kv[0])] = decodeURIComponent((kv[1]||'').replace(/\+/g,' '));
+  });
+  if (params.error) {
+    var msg = 'Deze inloglink is verlopen of ongeldig.';
+    if (params.error_code === 'otp_expired') {
+      msg = 'Deze inloglink is verlopen. Vraag een nieuwe link op via het loginscherm.';
+    }
+    showLoginErr(msg);
+    // Verwijder hash uit URL zodat bij refresh geen fout meer
+    history.replaceState(null, '', window.location.pathname);
+    return true;
+  }
+  return false;
+}
+
 // ── Check of er al een sessie is ──
 function checkSession() {
+  // Controleer eerst op hash errors (verlopen uitnodigingen)
+  if (checkHashError()) return;
+
   _supabase.auth.getSession().then(function(result) {
     var session = result.data.session;
     if (session) {
       loadProfile(session.access_token);
     }
-    // Luister naar auth state changes (o.a. na magic link klik)
+    // Luister naar auth state changes (o.a. na invite link klik)
     _supabase.auth.onAuthStateChange(function(event, session) {
-      if (event === 'SIGNED_IN' && session) {
+      if ((event === 'SIGNED_IN' || event === 'USER_UPDATED') && session) {
         loadProfile(session.access_token);
       }
       if (event === 'SIGNED_OUT') {
