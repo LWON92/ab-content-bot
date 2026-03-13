@@ -894,13 +894,39 @@ tr:hover td{background:var(--off);}
         </div>
       </div>
       <div id="set-tab3" style="display:none;">
-        <div class="ogate">
-          <div class="obadge"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>Alleen productowner</div>
-          <div class="fgrid" style="margin-top:10px;">
-            <div class="fg full"><label class="lbl">SEO Content Webhook URL</label><input type="url" id="whs" placeholder="https://your-n8n.com/webhook/seo-content"></div>
-            <div class="fg full"><label class="lbl">Meta Bulk Webhook URL</label><input type="url" id="whm" placeholder="https://your-n8n.com/webhook/meta-bulk"></div>
+        <div class="card">
+          <div class="ct"><svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>n8n Webhook URLs</div>
+          <p style="font-size:12px;color:var(--muted);margin-bottom:16px;line-height:1.6;">Stel per module de n8n webhook URL in. De bot gebruikt deze URL om jobs te verwerken.</p>
+          <div class="fgrid">
+            <div class="fg full">
+              <label class="lbl">
+                <svg viewBox="0 0 24 24" style="width:13px;height:13px;stroke:currentColor;stroke-width:1.8;fill:none;vertical-align:middle;margin-right:4px;"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
+                Productcategorie
+                <span id="wh-status-productcategorie" class="ast st-off" style="margin-left:8px;font-weight:400;">Niet ingesteld</span>
+              </label>
+              <input type="url" id="wh-productcategorie" placeholder="https://your-n8n.com/webhook/productcategorie">
+            </div>
+            <div class="fg full">
+              <label class="lbl">
+                <svg viewBox="0 0 24 24" style="width:13px;height:13px;stroke:currentColor;stroke-width:1.8;fill:none;vertical-align:middle;margin-right:4px;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                Meta Checker
+                <span id="wh-status-meta-checker" class="ast st-off" style="margin-left:8px;font-weight:400;">Niet ingesteld</span>
+              </label>
+              <input type="url" id="wh-meta-checker" placeholder="https://your-n8n.com/webhook/meta-checker">
+            </div>
+            <div class="fg full">
+              <label class="lbl">
+                <svg viewBox="0 0 24 24" style="width:13px;height:13px;stroke:currentColor;stroke-width:1.8;fill:none;vertical-align:middle;margin-right:4px;"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+                Meta Writer
+                <span id="wh-status-meta-writer" class="ast st-off" style="margin-left:8px;font-weight:400;">Niet ingesteld</span>
+              </label>
+              <input type="url" id="wh-meta-writer" placeholder="https://your-n8n.com/webhook/meta-writer">
+            </div>
           </div>
-          <button class="btn b-k" onclick="sWH()"><svg viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>Opslaan</button>
+          <button class="btn b-k" id="wh-save-btn" onclick="sWH()">
+            <svg viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+            Opslaan
+          </button>
         </div>
       </div>
       <div id="set-tab4" style="display:none;">
@@ -954,7 +980,7 @@ tr:hover td{background:var(--off);}
 
 // STATE
 var wl=[],cd=[],br=[];
-var wh={seo:'',meta:''};
+var wh={seo:'',meta:'','productcategorie':'','meta-checker':'','meta-writer':''};
 var cdf='all';
 
 var users=[]; // wordt gevuld via API
@@ -1007,6 +1033,8 @@ function setTab(n){
     document.getElementById('set-t'+i).classList.toggle('active',i===n);
     document.getElementById('set-tab'+i).style.display=i===n?'block':'none';
   });
+  // Laad webhooks als superadmin het webhooks tabblad opent
+  if(n===3 && _currentProfile && _currentProfile.role==='superadmin') loadWH();
 }
 
 // TOAST
@@ -1288,69 +1316,147 @@ function pcExport(){
 }
 
 // META CHECKER
-var mckData = [];
+var mckData = [];       // wachtrij (pending resultaten)
+var mckDone = [];       // voltooide resultaten
+var mckJobId = null;    // actieve job ID
+
 function mckRun(){
   var raw=document.getElementById('mck-urls').value.trim();
   if(!raw){toast('Voer eerst URLs in.','t-err');return;}
   var lines=raw.split('\n').map(function(l){return l.trim();}).filter(Boolean);
-  mckData=lines.map(function(url){
-    return {url:url, titel:'', beschrijving:''};
+  if(!lines.length){toast('Geen geldige URLs gevonden.','t-err');return;}
+
+  var btn=document.querySelector('#mck-tab1 .btn');
+  if(btn){btn.disabled=true;btn.textContent='Opslaan...';}
+
+  apiCall('POST','/api/meta-jobs',{urls:lines})
+  .then(function(d){
+    if(btn){
+      btn.disabled=false;
+      btn.innerHTML='<svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>Analyseren';
+    }
+    mckJobId=d.job.id;
+    mckData=lines.map(function(url){ return {url:url,status:'pending',current_title:'',current_description:''}; });
+    document.getElementById('mck-uc').textContent=lines.length+' URLs';
+    mckRenderQueue();
+    mckRenderReview();
+    mckTab(2);
+    toast(lines.length+' URLs opgeslagen. Klik "Analyseren met bot" om te starten.','t-ok');
+  })
+  .catch(function(e){
+    if(btn){btn.disabled=false;btn.innerHTML='<svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>Analyseren';}
+    toast('Fout: '+(e&&e.message||'onbekend'),'t-err');
   });
-  document.getElementById('mck-rcnt').textContent=mckData.length;
-  document.getElementById('mck-uc').textContent=lines.length+' URLs';
-  mckRenderReview();
-  mckRenderQueue();
-  mckTab(2);
-  toast(lines.length+' URLs klaar voor analyse. Webhook vereist.','t-ok');
 }
+
 function mckRenderReview(){
   var el=document.getElementById('mck-review');
-  if(!mckData.length){
-    el.innerHTML='<div class="empty"><svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/></svg><h3>Nog geen URLs geanalyseerd</h3></div>';
+  var cnt=document.getElementById('mck-rcnt');
+  var allDone=mckDone.length ? mckDone : mckData.filter(function(r){return r.status==='done';});
+  if(cnt) cnt.textContent=allDone.length;
+  if(!allDone.length){
+    el.innerHTML='<div class="empty"><svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg><h3>Nog geen URLs geanalyseerd</h3><p>Verwerk de wachtrij om resultaten te zien.</p></div>';
     return;
   }
-  el.innerHTML='<table><thead><tr><th>URL</th><th>Titel</th><th>Beschrijving</th></tr></thead><tbody>'+
-    mckData.map(function(r){
+  el.innerHTML='<table><thead><tr><th>URL</th><th>Huidige Titel</th><th>Huidige Beschrijving</th></tr></thead><tbody>'+
+    allDone.map(function(r){
       return '<tr>'+
         '<td class="mono" style="font-size:11px;">'+r.url+'</td>'+
-        '<td style="color:var(--muted);font-style:italic;">'+(r.titel||'—')+'</td>'+
-        '<td style="color:var(--muted);font-style:italic;">'+(r.beschrijving||'—')+'</td>'+
+        '<td>'+(r.current_title||'<span style="color:var(--muted);font-style:italic;">—</span>')+'</td>'+
+        '<td>'+(r.current_description||'<span style="color:var(--muted);font-style:italic;">—</span>')+'</td>'+
       '</tr>';
     }).join('')+'</tbody></table>';
 }
+
 function mckExport(){
-  if(!mckData.length){toast('Geen data om te exporteren.','t-err');return;}
-  var rows=mckData.map(function(r){return '"'+r.url+'","'+r.titel+'","'+r.beschrijving+'"';});
-  var csv=['URL,Titel,Beschrijving'].concat(rows).join('\n');
+  var allDone=mckDone.length ? mckDone : mckData.filter(function(r){return r.status==='done';});
+  if(!allDone.length){toast('Geen geanalyseerde data om te exporteren.','t-err');return;}
+  var rows=allDone.map(function(r){return '"'+r.url+'","'+(r.current_title||'')+'","'+(r.current_description||'')+'\"';});
+  var csv=['URL,Huidige Titel,Huidige Beschrijving'].concat(rows).join('\n');
   var a=document.createElement('a'); a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);
   a.download='meta-checker.csv'; a.click();
 }
-
 
 function mckRenderQueue(){
   var el=document.getElementById('mck-queue');
   var cnt=document.getElementById('mck-qcnt');
   var nc=document.getElementById('nc-mckq');
   var rb=document.getElementById('mck-runbtn');
-  if(cnt) cnt.textContent=mckData.length;
-  if(nc)  nc.textContent=mckData.length;
-  if(rb)  rb.disabled=!mckData.length;
+  var pending=mckData.filter(function(r){return r.status==='pending'||r.status==='processing';});
+  if(cnt) cnt.textContent=pending.length;
+  if(nc)  nc.textContent=pending.length;
+  if(rb)  rb.disabled=!pending.length;
   if(!el) return;
   if(!mckData.length){
     el.innerHTML='<div class="empty"><svg viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/></svg><h3>Wachtrij is leeg</h3><p>Voer URLs in via het Bulk tabblad om te starten.</p></div>';
     return;
   }
+  var statusBadge={'pending':'b-bl','processing':'b-or','done':'b-gn','error':'b-dn'};
+  var statusLabel={'pending':'wachtend','processing':'bezig','done':'klaar','error':'fout'};
   el.innerHTML='<table><thead><tr><th>URL</th><th>Status</th></tr></thead><tbody>'+
     mckData.map(function(r){
+      var sc=statusBadge[r.status]||'b-bl';
+      var sl=statusLabel[r.status]||r.status;
       return '<tr>'+
         '<td class="mono" style="font-size:11px;">'+r.url+'</td>'+
-        '<td><span class="badge b-bl">wachtend</span></td>'+
+        '<td><span class="badge '+sc+'">'+sl+'</span></td>'+
       '</tr>';
     }).join('')+'</tbody></table>';
 }
+
 function mckRunBot(){
   if(!mckData.length){toast('Wachtrij is leeg.','t-err');return;}
-  toast('Bot gestart voor '+mckData.length+' URL(s). Webhook vereist.','t-ok');
+  var webhookUrl=wh['meta-checker'];
+  if(!webhookUrl){
+    toast('Geen Meta Checker webhook ingesteld. Ga naar Instellingen \u2192 Webhooks.','t-err');
+    return;
+  }
+  var rb=document.getElementById('mck-runbtn');
+  if(rb){rb.disabled=true;rb.textContent='Versturen...';}
+  fetch(webhookUrl,{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({
+      job_id: mckJobId,
+      client_id: _activeClientId,
+      type:'meta-checker',
+      urls: mckData.map(function(r){return r.url;}),
+      ts: new Date().toISOString()
+    })
+  })
+  .then(function(resp){
+    if(rb){rb.disabled=false;rb.innerHTML='<svg viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>Analyseren met bot';}
+    if(resp.ok){
+      toast('Bot gestart voor '+mckData.length+' URL(s). Resultaten verschijnen in het Review tabblad.','t-ok');
+    } else {
+      toast('Webhook fout. Controleer de URL in Instellingen.','t-err');
+    }
+  })
+  .catch(function(){
+    if(rb){rb.disabled=false;rb.innerHTML='<svg viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>Analyseren met bot';}
+    toast('Kon de webhook niet bereiken.','t-err');
+  });
+}
+
+function loadMckJob(){
+  // Laad actieve (pending/processing) job
+  apiCall('GET','/api/meta-jobs/active').then(function(d){
+    if(d&&d.job&&d.results&&d.results.length){
+      mckJobId=d.job.id;
+      mckData=d.results;
+      mckDone=d.results.filter(function(r){return r.status==='done';});
+      mckRenderQueue();
+      mckRenderReview();
+    } else {
+      // Geen actieve job — probeer voltooide job
+      apiCall('GET','/api/meta-jobs/done').then(function(d2){
+        if(d2&&d2.results&&d2.results.length){
+          mckDone=d2.results;
+          mckRenderReview();
+        }
+      }).catch(function(){});
+    }
+  }).catch(function(){});
 }
 // META WRITER
 var mwrData = [];
@@ -1835,12 +1941,60 @@ function sKey(service,inputId,statusId){
   if(s){s.textContent='Opgeslagen';s.className='ast st-on';}
   toast(service+' sleutel opgeslagen.','t-ok');
 }
+function loadWH(){
+  apiCall('GET','/api/webhooks').then(function(d){
+    if(!d||!d.webhooks) return;
+    var types=['productcategorie','meta-checker','meta-writer'];
+    types.forEach(function(t){
+      var row=d.webhooks.find(function(w){return w.type===t;});
+      var inp=document.getElementById('wh-'+t);
+      var st=document.getElementById('wh-status-'+t);
+      if(row&&row.url){
+        wh[t]=row.url;
+        if(inp) inp.value=row.url;
+        if(st){ st.textContent='Ingesteld'; st.className='ast st-on'; }
+      } else {
+        wh[t]='';
+        if(inp) inp.value='';
+        if(st){ st.textContent='Niet ingesteld'; st.className='ast st-off'; }
+      }
+    });
+  }).catch(function(){});
+}
+
 function sWH(){
-  var s=document.getElementById('whs');
-  var m=document.getElementById('whm');
-  if(s) wh.seo=s.value.trim();
-  if(m) wh.meta=m.value.trim();
-  toast('Webhook URLs opgeslagen.','t-ok');
+  var btn=document.getElementById('wh-save-btn');
+  if(btn){ btn.disabled=true; btn.textContent='Opslaan...'; }
+  var webhooks=[
+    {type:'productcategorie', url:(document.getElementById('wh-productcategorie')||{}).value||''},
+    {type:'meta-checker',     url:(document.getElementById('wh-meta-checker')||{}).value||''},
+    {type:'meta-writer',      url:(document.getElementById('wh-meta-writer')||{}).value||''}
+  ];
+  apiCall('PUT','/api/webhooks',{webhooks:webhooks}).then(function(d){
+    if(btn){
+      btn.disabled=false;
+      btn.innerHTML='<svg viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>Opslaan';
+    }
+    // Lokale state + statusindicatoren bijwerken
+    var types=['productcategorie','meta-checker','meta-writer'];
+    types.forEach(function(t){
+      var inp=document.getElementById('wh-'+t);
+      var st=document.getElementById('wh-status-'+t);
+      var url=inp?inp.value.trim():'';
+      wh[t]=url;
+      if(st){
+        if(url){ st.textContent='Ingesteld'; st.className='ast st-on'; }
+        else   { st.textContent='Niet ingesteld'; st.className='ast st-off'; }
+      }
+    });
+    toast('Webhook URLs opgeslagen.','t-ok');
+  }).catch(function(e){
+    if(btn){
+      btn.disabled=false;
+      btn.innerHTML='<svg viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>Opslaan';
+    }
+    toast('Fout bij opslaan: '+(e&&e.message||'onbekend'),'t-err');
+  });
 }
 
 
@@ -1945,6 +2099,8 @@ function loadProfile(token) {
     loadClients();
     loadUsers();
     rInvitations();
+    if(data.user.role==='superadmin') loadWH();
+    loadMckJob();
   })
   .catch(function(e){
     console.error('Profiel laden mislukt:', e);

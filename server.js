@@ -412,6 +412,151 @@ app.delete('/api/user-clients/:user_id/:client_id', requireAuth, requireAdmin, a
 });
 
 // ════════════════════════════════════════════════
+//  META CHECKER JOBS
+// ════════════════════════════════════════════════
+
+// POST /api/meta-jobs — maak nieuwe job + URL-rijen aan
+app.post('/api/meta-jobs', requireAuth, async (req, res) => {
+  const { urls } = req.body;
+  if (!Array.isArray(urls) || !urls.length) {
+    return res.status(400).json({ error: 'urls array vereist' });
+  }
+
+  // Maak job aan
+  const { data: job, error: jobErr } = await db
+    .from('meta_jobs')
+    .insert({ client_id: req.clientId, created_by: req.profile.id, status: 'pending', type: 'checker' })
+    .select()
+    .single();
+  if (jobErr) return res.status(500).json({ error: jobErr.message });
+
+  // Maak result-rijen aan
+  const rows = urls.map(function(url) {
+    return { job_id: job.id, client_id: req.clientId, url, status: 'pending' };
+  });
+  const { error: rowErr } = await db.from('meta_results').insert(rows);
+  if (rowErr) return res.status(500).json({ error: rowErr.message });
+
+  res.json({ job });
+});
+
+// GET /api/meta-jobs/active — haal actieve job + resultaten op
+app.get('/api/meta-jobs/active', requireAuth, async (req, res) => {
+  const { data: job, error: jobErr } = await db
+    .from('meta_jobs')
+    .select('id, status, created_at, type')
+    .eq('client_id', req.clientId)
+    .eq('type', 'checker')
+    .in('status', ['pending', 'processing'])
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .single();
+
+  if (jobErr || !job) return res.json({ job: null, results: [] });
+
+  const { data: results } = await db
+    .from('meta_results')
+    .select('id, url, status, current_title, current_description')
+    .eq('job_id', job.id)
+    .order('created_at', { ascending: true });
+
+  res.json({ job, results: results || [] });
+});
+
+// GET /api/meta-jobs/done — haal voltooide jobs + resultaten op
+app.get('/api/meta-jobs/done', requireAuth, async (req, res) => {
+  const { data: jobs } = await db
+    .from('meta_jobs')
+    .select('id, status, created_at')
+    .eq('client_id', req.clientId)
+    .eq('type', 'checker')
+    .eq('status', 'done')
+    .order('created_at', { ascending: false })
+    .limit(1);
+
+  if (!jobs || !jobs.length) return res.json({ job: null, results: [] });
+  const job = jobs[0];
+
+  const { data: results } = await db
+    .from('meta_results')
+    .select('id, url, status, current_title, current_description')
+    .eq('job_id', job.id)
+    .order('created_at', { ascending: true });
+
+  res.json({ job, results: results || [] });
+});
+
+// ════════════════════════════════════════════════
+//  WEBHOOKS (superadmin only)
+// ════════════════════════════════════════════════
+const WEBHOOK_TYPES = ['productcategorie', 'meta-checker', 'meta-writer'];
+
+// GET /api/webhooks — haal webhooks op voor actieve klant
+app.get('/api/webhooks', requireAuth, requireSuperadmin, async (req, res) => {
+  const { data, error } = await db
+    .from('webhooks')
+    .select('id, type, url, is_active')
+    .eq('client_id', req.clientId);
+
+  if (error) return res.status(500).json({ error: error.message });
+  res.json({ webhooks: data || [] });
+});
+
+// PUT /api/webhooks — sla webhooks op (upsert per type)
+app.put('/api/webhooks', requireAuth, requireSuperadmin, async (req, res) => {
+  const { webhooks } = req.body; // [{type, url}]
+  if (!Array.isArray(webhooks)) return res.status(400).json({ error: 'webhooks array vereist' });
+
+  const results = [];
+  for (const wh of webhooks) {
+    if (!WEBHOOK_TYPES.includes(wh.type)) continue;
+
+    // Check of er al een rij bestaat voor deze client+type
+    const { data: existing } = await db
+      .from('webhooks')
+      .select('id')
+      .eq('client_id', req.clientId)
+      .eq('type', wh.type)
+      .single();
+
+    if (existing) {
+      const { data, error } = await db
+        .from('webhooks')
+        .update({ url: wh.url || '', is_active: !!(wh.url) })
+        .eq('id', existing.id)
+        .select()
+        .single();
+      if (!error) results.push(data);
+    } else {
+      const { data, error } = await db
+        .from('webhooks')
+        .insert({ client_id: req.clientId, type: wh.type, url: wh.url || '', is_active: !!(wh.url) })
+        .select()
+        .single();
+      if (!error) results.push(data);
+    }
+  }
+
+  res.json({ webhooks: results });
+});
+
+// GET /api/webhooks/:type — haal 1 webhook op (voor gebruik door modules)
+app.get('/api/webhooks/:type', requireAuth, async (req, res) => {
+  if (!WEBHOOK_TYPES.includes(req.params.type)) {
+    return res.status(400).json({ error: 'Ongeldig webhook type' });
+  }
+  const { data, error } = await db
+    .from('webhooks')
+    .select('url, is_active')
+    .eq('client_id', req.clientId)
+    .eq('type', req.params.type)
+    .single();
+
+  if (error || !data) return res.json({ url: '', is_active: false });
+  res.json(data);
+});
+
+// ════════════════════════════════════════════════
 //  SPA CATCH-ALL
 // ════════════════════════════════════════════════
 app.get('*', (req, res) => {
