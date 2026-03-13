@@ -96,9 +96,16 @@ async function requireAuth(req, res, next) {
   next();
 }
 
-function requireOwner(req, res, next) {
-  if (req.profile.role !== 'owner') {
-    return res.status(403).json({ error: 'Alleen owners mogen dit doen' });
+function requireAdmin(req, res, next) {
+  if (!['superadmin','admin'].includes(req.profile.role)) {
+    return res.status(403).json({ error: 'Onvoldoende rechten' });
+  }
+  next();
+}
+
+function requireSuperadmin(req, res, next) {
+  if (req.profile.role !== 'superadmin') {
+    return res.status(403).json({ error: 'Alleen superadmin heeft toegang' });
   }
   next();
 }
@@ -152,27 +159,26 @@ app.get('/api/users', requireAuth, async (req, res) => {
     .order('added_at', { ascending: true });
 
   if (error) return res.status(500).json({ error: error.message });
-  // Flatten: voeg rol toe aan user object
-  const users = (data || []).map(function(row) {
-    return { ...row.users, role: row.role };
-  });
+  // Flatten + filter superadmin uit klantenoverzicht
+  const users = (data || [])
+    .map(function(row) { return { ...row.users, role: row.role }; })
+    .filter(function(u) { return u.role !== 'superadmin'; });
   return res.json({ users });
 
-  // (dummy zodat onderstaande error check niet dubbel valt)
   const _dummy = null;
 });
 
-app.put('/api/users/:id', requireAuth, requireOwner, async (req, res) => {
+app.put('/api/users/:id', requireAuth, requireAdmin, async (req, res) => {
   const { role } = req.body;
   if (!['admin','member','viewer'].includes(role)) {
     return res.status(400).json({ error: 'Ongeldige rol' });
   }
   const { data, error } = await db
-    .from('users')
+    .from('user_clients')
     .update({ role })
-    .eq('id', req.params.id)
-    .eq('client_id', req.profile.client_id)
-    .neq('role', 'owner')
+    .eq('user_id', req.params.id)
+    .eq('client_id', req.clientId)
+    .neq('role', 'superadmin')
     .select()
     .single();
 
@@ -180,7 +186,7 @@ app.put('/api/users/:id', requireAuth, requireOwner, async (req, res) => {
   res.json({ user: data });
 });
 
-app.delete('/api/users/:id', requireAuth, requireOwner, async (req, res) => {
+app.delete('/api/users/:id', requireAuth, requireAdmin, async (req, res) => {
   if (req.params.id === req.profile.id) {
     return res.status(400).json({ error: 'Je kunt jezelf niet verwijderen' });
   }
@@ -211,11 +217,15 @@ app.get('/api/invitations', requireAuth, async (req, res) => {
   res.json({ invitations: data });
 });
 
-app.post('/api/invitations', requireAuth, requireOwner, async (req, res) => {
+app.post('/api/invitations', requireAuth, requireAdmin, async (req, res) => {
   const { email, role } = req.body;
   if (!email) return res.status(400).json({ error: 'E-mailadres vereist' });
   if (!['admin','member','viewer'].includes(role)) {
     return res.status(400).json({ error: 'Ongeldige rol' });
+  }
+  // Superadmin kan niet via uitnodiging worden aangemaakt
+  if (role === 'superadmin') {
+    return res.status(403).json({ error: 'Superadmin kan niet worden uitgenodigd' });
   }
 
   // Controleer of gebruiker al bestaat
@@ -266,7 +276,7 @@ app.post('/api/invitations', requireAuth, requireOwner, async (req, res) => {
   res.json({ invitation });
 });
 
-app.delete('/api/invitations/:id', requireAuth, requireOwner, async (req, res) => {
+app.delete('/api/invitations/:id', requireAuth, requireAdmin, async (req, res) => {
   const { error } = await db
     .from('invitations')
     .delete()
@@ -277,7 +287,7 @@ app.delete('/api/invitations/:id', requireAuth, requireOwner, async (req, res) =
   res.json({ success: true });
 });
 
-app.post('/api/invitations/:id/resend', requireAuth, requireOwner, async (req, res) => {
+app.post('/api/invitations/:id/resend', requireAuth, requireAdmin, async (req, res) => {
   const { data: inv } = await db
     .from('invitations')
     .select('email, role')
@@ -374,7 +384,7 @@ app.get('/api/clients', requireAuth, async (req, res) => {
 });
 
 // POST /api/user-clients — extra klant koppelen aan gebruiker (owner only)
-app.post('/api/user-clients', requireAuth, requireOwner, async (req, res) => {
+app.post('/api/user-clients', requireAuth, requireAdmin, async (req, res) => {
   const { user_id, client_id, role } = req.body;
   if (!user_id || !client_id) return res.status(400).json({ error: 'user_id en client_id vereist' });
   if (!['admin','member','viewer'].includes(role)) return res.status(400).json({ error: 'Ongeldige rol' });
@@ -390,7 +400,7 @@ app.post('/api/user-clients', requireAuth, requireOwner, async (req, res) => {
 });
 
 // DELETE /api/user-clients/:user_id/:client_id — koppeling verwijderen (owner only)
-app.delete('/api/user-clients/:user_id/:client_id', requireAuth, requireOwner, async (req, res) => {
+app.delete('/api/user-clients/:user_id/:client_id', requireAuth, requireAdmin, async (req, res) => {
   const { error } = await db
     .from('user_clients')
     .delete()
