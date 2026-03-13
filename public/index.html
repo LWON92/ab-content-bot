@@ -498,19 +498,7 @@ tr:hover td{background:var(--off);}
         </div>
         <div class="cdrop" id="cdrop">
           <div class="cd-lbl">Klanten</div>
-          <div class="cd-item sel" onclick="swClient('Bosta NL','BN',this)">
-            <div style="width:22px;height:22px;font-size:9px;background:var(--brand);color:var(--black);border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0;">BN</div>
-            Bosta NL
-          </div>
-          <div class="cd-item" onclick="swClient('Norlandia','NO',this)">
-            <div style="width:22px;height:22px;font-size:9px;background:var(--gbg);color:var(--green);border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0;">NO</div>
-            Norlandia
-          </div>
-          <div class="cd-div"></div>
-          <div class="cd-item" onclick="go(null,'settings');closeDrop();">
-            <svg viewBox="0 0 24 24" style="width:13px;height:13px;stroke:var(--muted);stroke-width:2;fill:none;"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-            <span style="color:var(--muted);">Klant toevoegen</span>
-          </div>
+          <div id="client-list"><!-- dynamisch --></div>
         </div>
       </div>
     </div>
@@ -1647,6 +1635,38 @@ function closeDrop(){
   var d=document.getElementById('cdrop');
   if(d) d.style.display='none';
 }
+
+var _activeClientId=null;
+
+function loadClients(){
+  apiCall('GET','/api/clients').then(function(d){
+    var list=document.getElementById('client-list');
+    if(!list) return;
+    var clients=d.clients||[];
+    list.innerHTML=clients.map(function(c){
+      var isSel=c.id===_activeClientId;
+      return '<div class="cd-item'+(isSel?' sel':'')+'" data-cid="'+c.id+'" data-name="'+esc(c.name)+'" data-ini="'+esc(c.initials)+'">'
+        +'<div style="width:22px;height:22px;font-size:9px;background:var(--brand);color:var(--black);border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0;">'+esc(c.initials)+'</div>'
+        +esc(c.name)+'</div>';
+    }).join('');
+    list.querySelectorAll('.cd-item').forEach(function(el){
+      el.addEventListener('click',function(){
+        swClient(this.dataset.name,this.dataset.ini,this.dataset.cid,this);
+      });
+    });
+  }).catch(function(){});
+}
+
+function swClient(name,ini,clientId,el){
+  _activeClientId=clientId;
+  document.querySelectorAll('#client-list .cd-item').forEach(function(i){i.classList.remove('sel');});
+  if(el) el.classList.add('sel');
+  var cn=document.getElementById('cname'); if(cn) cn.textContent=name;
+  var ca=document.getElementById('cav');   if(ca) ca.textContent=ini;
+  closeDrop();
+  loadUsers();
+  rInvitations();
+}
 document.addEventListener('click',function(e){
   var cpill=document.querySelector('.cpill');
   var cdrop=document.getElementById('cdrop');
@@ -1828,7 +1848,9 @@ function sWH(){
 function apiCall(method,url,body){
   return _supabase.auth.getSession().then(function(result){
     var token=result.data.session?result.data.session.access_token:'';
-    var opts={method:method,headers:{'Content-Type':'application/json','Authorization':'Bearer '+token}};
+    var hdrs={'Content-Type':'application/json','Authorization':'Bearer '+token};
+    if(_activeClientId) hdrs['x-client-id']=_activeClientId;
+    var opts={method:method,headers:hdrs};
     if(body) opts.body=JSON.stringify(body);
     return fetch(url,opts).then(function(r){
       return r.json().then(function(data){
@@ -1915,8 +1937,10 @@ function loadProfile(token) {
       return;
     }
     _currentProfile = data.user;
+    _activeClientId = data.user.client_id;
     applyProfile(data.user);
     hideLoginScreen();
+    loadClients();
     loadUsers();
     rInvitations();
   })

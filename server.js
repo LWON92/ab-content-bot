@@ -91,6 +91,8 @@ async function requireAuth(req, res, next) {
 
   req.user    = user;
   req.profile = profile;
+  // Actieve klant: uit header of primaire klant
+  req.clientId = req.headers['x-client-id'] || profile.client_id;
   next();
 }
 
@@ -128,7 +130,15 @@ app.get('/api/me', async (req, res) => {
     return res.status(404).json({ error: 'Gebruiker niet gevonden in database' });
   }
 
-  res.json({ user: profile });
+  // Haal alle gekoppelde klanten op via user_clients
+  const { data: clientLinks } = await db
+    .from('user_clients')
+    .select('role, clients(id, name, initials, slug)')
+    .eq('user_id', user.id);
+
+  res.json({ user: profile, clients: (clientLinks || []).map(function(l) {
+    return { ...l.clients, role: l.role };
+  })});
 });
 
 // ════════════════════════════════════════════════
@@ -136,13 +146,20 @@ app.get('/api/me', async (req, res) => {
 // ════════════════════════════════════════════════
 app.get('/api/users', requireAuth, async (req, res) => {
   const { data, error } = await db
-    .from('users')
-    .select('id, name, email, role, avatar_color, is_active, added_at, last_login_at')
-    .eq('client_id', req.profile.client_id)
+    .from('user_clients')
+    .select('role, users(id, name, email, avatar_color, is_active, added_at, last_login_at)')
+    .eq('client_id', req.clientId)
     .order('added_at', { ascending: true });
 
   if (error) return res.status(500).json({ error: error.message });
-  res.json({ users: data });
+  // Flatten: voeg rol toe aan user object
+  const users = (data || []).map(function(row) {
+    return { ...row.users, role: row.role };
+  });
+  return res.json({ users });
+
+  // (dummy zodat onderstaande error check niet dubbel valt)
+  const _dummy = null;
 });
 
 app.put('/api/users/:id', requireAuth, requireOwner, async (req, res) => {
@@ -338,6 +355,50 @@ app.put('/api/me/profile', requireAuth, async (req, res) => {
 
   if (error) return res.status(500).json({ error: error.message });
   res.json({ user: data });
+});
+
+// ════════════════════════════════════════════════
+//  CLIENTS — voor klantenswitcher
+// ════════════════════════════════════════════════
+app.get('/api/clients', requireAuth, async (req, res) => {
+  const { data, error } = await db
+    .from('user_clients')
+    .select('role, clients(id, name, initials, slug)')
+    .eq('user_id', req.profile.id);
+
+  if (error) return res.status(500).json({ error: error.message });
+  const clients = (data || []).map(function(row) {
+    return { ...row.clients, role: row.role };
+  });
+  res.json({ clients });
+});
+
+// POST /api/user-clients — extra klant koppelen aan gebruiker (owner only)
+app.post('/api/user-clients', requireAuth, requireOwner, async (req, res) => {
+  const { user_id, client_id, role } = req.body;
+  if (!user_id || !client_id) return res.status(400).json({ error: 'user_id en client_id vereist' });
+  if (!['admin','member','viewer'].includes(role)) return res.status(400).json({ error: 'Ongeldige rol' });
+
+  const { data, error } = await db
+    .from('user_clients')
+    .insert({ user_id, client_id, role })
+    .select()
+    .single();
+
+  if (error) return res.status(500).json({ error: error.message });
+  res.json({ link: data });
+});
+
+// DELETE /api/user-clients/:user_id/:client_id — koppeling verwijderen (owner only)
+app.delete('/api/user-clients/:user_id/:client_id', requireAuth, requireOwner, async (req, res) => {
+  const { error } = await db
+    .from('user_clients')
+    .delete()
+    .eq('user_id', req.params.user_id)
+    .eq('client_id', req.params.client_id);
+
+  if (error) return res.status(500).json({ error: error.message });
+  res.json({ success: true });
 });
 
 // ════════════════════════════════════════════════
