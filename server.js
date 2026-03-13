@@ -411,6 +411,70 @@ app.delete('/api/user-clients/:user_id/:client_id', requireAuth, requireAdmin, a
   res.json({ success: true });
 });
 
+// PATCH /api/meta-results/:jobId — n8n schrijft resultaten terug per URL
+// Body: { results: [{url, current_title, current_description, status}] }
+app.patch('/api/meta-results/:jobId', async (req, res) => {
+  const { results } = req.body;
+  if (!Array.isArray(results) || !results.length) {
+    return res.status(400).json({ error: 'results array vereist' });
+  }
+
+  // Verifieer dat de job bestaat
+  const { data: job, error: jobErr } = await db
+    .from('meta_jobs')
+    .select('id, client_id, status')
+    .eq('id', req.params.jobId)
+    .single();
+
+  if (jobErr || !job) return res.status(404).json({ error: 'Job niet gevonden' });
+
+  // Update resultaten per URL
+  for (const r of results) {
+    if (!r.url) continue;
+    await db
+      .from('meta_results')
+      .update({
+        current_title:       r.current_title       || null,
+        current_description: r.current_description || null,
+        status:              r.status || 'done'
+      })
+      .eq('job_id', job.id)
+      .eq('url', r.url);
+  }
+
+  // Check of alle resultaten klaar zijn → job status op 'done'
+  const { data: pending } = await db
+    .from('meta_results')
+    .select('id')
+    .eq('job_id', job.id)
+    .in('status', ['pending', 'processing']);
+
+  if (!pending || !pending.length) {
+    await db.from('meta_jobs').update({ status: 'done' }).eq('id', job.id);
+  }
+
+  res.json({ success: true });
+});
+
+// GET /api/meta-results/:jobId — frontend pollt voor live statusupdates
+app.get('/api/meta-results/:jobId', requireAuth, async (req, res) => {
+  const { data: results, error } = await db
+    .from('meta_results')
+    .select('id, url, status, current_title, current_description')
+    .eq('job_id', req.params.jobId)
+    .order('created_at', { ascending: true });
+
+  if (error) return res.status(500).json({ error: error.message });
+
+  const { data: job } = await db
+    .from('meta_jobs')
+    .select('status')
+    .eq('id', req.params.jobId)
+    .single();
+
+  res.json({ results: results || [], job_status: job ? job.status : 'unknown' });
+});
+
 // ════════════════════════════════════════════════
 //  META CHECKER JOBS
 // ════════════════════════════════════════════════

@@ -1404,6 +1404,32 @@ function mckRenderQueue(){
     }).join('')+'</tbody></table>';
 }
 
+var mckPollTimer = null;
+
+function mckStartPolling(){
+  if(mckPollTimer) return; // al bezig
+  mckPollTimer = setInterval(function(){
+    if(!mckJobId){ mckStopPolling(); return; }
+    apiCall('GET','/api/meta-results/'+mckJobId).then(function(d){
+      if(!d||!d.results) return;
+      mckData=d.results;
+      mckDone=d.results.filter(function(r){return r.status==='done';});
+      mckRenderQueue();
+      mckRenderReview();
+      // Stop polling als job klaar is
+      if(d.job_status==='done'){
+        mckStopPolling();
+        toast('Analyse voltooid! '+mckDone.length+' URLs geanalyseerd.','t-ok');
+        mckTab(3);
+      }
+    }).catch(function(){});
+  }, 5000);
+}
+
+function mckStopPolling(){
+  if(mckPollTimer){ clearInterval(mckPollTimer); mckPollTimer=null; }
+}
+
 function mckRunBot(){
   if(!mckData.length){toast('Wachtrij is leeg.','t-err');return;}
   var webhookUrl=wh['meta-checker'];
@@ -1427,7 +1453,8 @@ function mckRunBot(){
   .then(function(resp){
     if(rb){rb.disabled=false;rb.innerHTML='<svg viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>Analyseren met bot';}
     if(resp.ok){
-      toast('Bot gestart voor '+mckData.length+' URL(s). Resultaten verschijnen in het Review tabblad.','t-ok');
+      toast('Bot gestart voor '+mckData.length+' URL(s). Resultaten laden automatisch.','t-ok');
+      mckStartPolling();
     } else {
       toast('Webhook fout. Controleer de URL in Instellingen.','t-err');
     }
@@ -1447,6 +1474,10 @@ function loadMckJob(){
       mckDone=d.results.filter(function(r){return r.status==='done';});
       mckRenderQueue();
       mckRenderReview();
+      // Als job nog bezig is, start polling
+      if(d.job.status==='processing'||d.results.some(function(r){return r.status==='processing';})){
+        mckStartPolling();
+      }
     } else {
       // Geen actieve job — probeer voltooide job
       apiCall('GET','/api/meta-jobs/done').then(function(d2){
