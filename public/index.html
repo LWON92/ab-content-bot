@@ -1316,7 +1316,7 @@ function pcExport(){
 }
 
 // META CHECKER
-var mckData = [];       // wachtrij (pending resultaten)
+var mckData = [];       // wachtrij (wachtende resultaten)
 var mckDone = [];       // voltooide resultaten
 var mckJobId = null;    // actieve job ID
 
@@ -1336,7 +1336,7 @@ function mckRun(){
       btn.innerHTML='<svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>Analyseren';
     }
     mckJobId=d.job.id;
-    mckData=lines.map(function(url){ return {url:url,status:'pending',current_title:'',current_description:''}; });
+    mckData=lines.map(function(url){ return {url:url,status:'wachtend',current_title:'',current_description:''}; });
     document.getElementById('mck-uc').textContent=lines.length+' URLs';
     mckRenderQueue();
     mckRenderReview();
@@ -1352,8 +1352,7 @@ function mckRun(){
 function mckRenderReview(){
   var el=document.getElementById('mck-review');
   var cnt=document.getElementById('mck-rcnt');
-  var allDone=mckDone.length ? mckDone : mckData.filter(function(r){return r.status==='done';});
-  if(cnt) cnt.textContent=allDone.length;
+  var allDone=mckDone.length ? mckDone : mckData.filter(function(r){return r.status==='verwerkt';});
   if(!allDone.length){
     el.innerHTML='<div class="empty"><svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg><h3>Nog geen URLs geanalyseerd</h3><p>Verwerk de wachtrij om resultaten te zien.</p></div>';
     return;
@@ -1369,8 +1368,7 @@ function mckRenderReview(){
 }
 
 function mckExport(){
-  var allDone=mckDone.length ? mckDone : mckData.filter(function(r){return r.status==='done';});
-  if(!allDone.length){toast('Geen geanalyseerde data om te exporteren.','t-err');return;}
+  var allDone=mckDone.length ? mckDone : mckData.filter(function(r){return r.status==='verwerkt';});
   var rows=allDone.map(function(r){return '"'+r.url+'","'+(r.current_title||'')+'","'+(r.current_description||'')+'\"';});
   var csv=['URL,Huidige Titel,Huidige Beschrijving'].concat(rows).join('\n');
   var a=document.createElement('a'); a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);
@@ -1382,7 +1380,7 @@ function mckRenderQueue(){
   var cnt=document.getElementById('mck-qcnt');
   var nc=document.getElementById('nc-mckq');
   var rb=document.getElementById('mck-runbtn');
-  var pending=mckData.filter(function(r){return r.status==='pending'||r.status==='processing';});
+  var pending=mckData.filter(function(r){return r.status==='wachtend';});
   if(cnt) cnt.textContent=pending.length;
   if(nc)  nc.textContent=pending.length;
   if(rb)  rb.disabled=!pending.length;
@@ -1391,8 +1389,8 @@ function mckRenderQueue(){
     el.innerHTML='<div class="empty"><svg viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/></svg><h3>Wachtrij is leeg</h3><p>Voer URLs in via het Bulk tabblad om te starten.</p></div>';
     return;
   }
-  var statusBadge={'pending':'b-bl','processing':'b-or','done':'b-gn','error':'b-dn'};
-  var statusLabel={'pending':'wachtend','processing':'bezig','done':'klaar','error':'fout'};
+  var statusBadge={'wachtend':'b-bl','verwerkt':'b-gn','fout':'b-dn'};
+  var statusLabel={'wachtend':'wachtend','verwerkt':'klaar','fout':'fout'};
   el.innerHTML='<table><thead><tr><th>URL</th><th>Status</th></tr></thead><tbody>'+
     mckData.map(function(r){
       var sc=statusBadge[r.status]||'b-bl';
@@ -1413,11 +1411,11 @@ function mckStartPolling(){
     apiCall('GET','/api/meta-results/'+mckJobId).then(function(d){
       if(!d||!d.results) return;
       mckData=d.results;
-      mckDone=d.results.filter(function(r){return r.status==='done';});
+      mckDone=d.results.filter(function(r){return r.status==='verwerkt';});
       mckRenderQueue();
       mckRenderReview();
       // Stop polling als job klaar is
-      if(d.job_status==='done'){
+      if(d.job_status==='verwerkt'){
         mckStopPolling();
         toast('Analyse voltooid! '+mckDone.length+' URLs geanalyseerd.','t-ok');
         mckTab(3);
@@ -1471,11 +1469,11 @@ function loadMckJob(){
     if(d&&d.job&&d.results&&d.results.length){
       mckJobId=d.job.id;
       mckData=d.results;
-      mckDone=d.results.filter(function(r){return r.status==='done';});
+      mckDone=d.results.filter(function(r){return r.status==='verwerkt';});
       mckRenderQueue();
       mckRenderReview();
       // Als job nog bezig is, start polling
-      if(d.job.status==='processing'||d.results.some(function(r){return r.status==='processing';})){
+      if(d.job.status==='wachtend'||d.results.some(function(r){return r.status==='wachtend';})){
         mckStartPolling();
       }
     } else {

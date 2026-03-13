@@ -436,21 +436,21 @@ app.patch('/api/meta-results/:jobId', async (req, res) => {
       .update({
         current_title:       r.current_title       || null,
         current_description: r.current_description || null,
-        status:              r.status || 'done'
+        status:              r.status || 'verwerkt'
       })
       .eq('job_id', job.id)
       .eq('url', r.url);
   }
 
-  // Check of alle resultaten klaar zijn → job status op 'done'
+  // Check of alle resultaten klaar zijn → job status op 'verwerkt'
   const { data: pending } = await db
     .from('meta_results')
     .select('id')
     .eq('job_id', job.id)
-    .in('status', ['pending', 'processing']);
+    .in('status', ['wachtend', 'verwerkt']);
 
   if (!pending || !pending.length) {
-    await db.from('meta_jobs').update({ status: 'done' }).eq('id', job.id);
+    await db.from('meta_jobs').update({ status: 'verwerkt' }).eq('id', job.id);
   }
 
   res.json({ success: true });
@@ -489,14 +489,14 @@ app.post('/api/meta-jobs', requireAuth, async (req, res) => {
   // Maak job aan
   const { data: job, error: jobErr } = await db
     .from('meta_jobs')
-    .insert({ client_id: req.clientId, created_by: req.profile.id, status: 'pending', type: 'checker' })
+    .insert({ client_id: req.clientId, created_by: req.profile.id, status: 'wachtend', type: 'checker' })
     .select()
     .single();
   if (jobErr) return res.status(500).json({ error: jobErr.message });
 
   // Maak result-rijen aan
   const rows = urls.map(function(url) {
-    return { job_id: job.id, client_id: req.clientId, url, status: 'pending' };
+    return { job_id: job.id, client_id: req.clientId, url, status: 'wachtend' };
   });
   const { error: rowErr } = await db.from('meta_results').insert(rows);
   if (rowErr) return res.status(500).json({ error: rowErr.message });
@@ -511,7 +511,7 @@ app.get('/api/meta-jobs/active', requireAuth, async (req, res) => {
     .select('id, status, created_at, type')
     .eq('client_id', req.clientId)
     .eq('type', 'checker')
-    .in('status', ['pending', 'processing'])
+    .in('status', ['wachtend', 'verwerkt'])
     .order('created_at', { ascending: false })
     .limit(1)
     .single();
@@ -534,7 +534,7 @@ app.get('/api/meta-jobs/done', requireAuth, async (req, res) => {
     .select('id, status, created_at')
     .eq('client_id', req.clientId)
     .eq('type', 'checker')
-    .eq('status', 'done')
+    .eq('status', 'verwerkt')
     .order('created_at', { ascending: false })
     .limit(1);
 
