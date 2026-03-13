@@ -298,8 +298,10 @@ app.post('/api/invitations/:id/resend', requireAuth, requireOwner, async (req, r
 });
 
 // ════════════════════════════════════════════════
-//  ME — NAAM BIJWERKEN
+//  ME — PROFIEL BIJWERKEN (naam + avatar kleur)
 // ════════════════════════════════════════════════
+const VALID_COLORS = ['av-b','av-g','av-a','av-gr','av-p','av-r','av-t'];
+
 app.put('/api/me/name', requireAuth, async (req, res) => {
   const { name } = req.body;
   if (!name || name.trim().length < 2) {
@@ -308,6 +310,28 @@ app.put('/api/me/name', requireAuth, async (req, res) => {
   const { data, error } = await db
     .from('users')
     .update({ name: name.trim() })
+    .eq('id', req.profile.id)
+    .select()
+    .single();
+
+  if (error) return res.status(500).json({ error: error.message });
+  res.json({ user: data });
+});
+
+app.put('/api/me/profile', requireAuth, async (req, res) => {
+  const { name, avatar_color } = req.body;
+  if (!name || name.trim().length < 2) {
+    return res.status(400).json({ error: 'Naam te kort' });
+  }
+  if (avatar_color && !VALID_COLORS.includes(avatar_color)) {
+    return res.status(400).json({ error: 'Ongeldige kleur' });
+  }
+  const updates = { name: name.trim() };
+  if (avatar_color) updates.avatar_color = avatar_color;
+
+  const { data, error } = await db
+    .from('users')
+    .update(updates)
     .eq('id', req.profile.id)
     .select()
     .single();
