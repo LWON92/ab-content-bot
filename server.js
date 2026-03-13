@@ -5,21 +5,74 @@ const { createClient } = require('@supabase/supabase-js');
 const app  = express();
 const PORT = process.env.PORT || 3000;
 
-// ── Supabase clients ──
 const supabaseUrl     = process.env.SUPABASE_URL;
 const supabaseAnon    = process.env.SUPABASE_ANON_KEY;
 const supabaseService = process.env.SUPABASE_SERVICE_KEY;
+const resendKey       = process.env.RESEND_API_KEY;
+const appUrl          = process.env.APP_URL || 'https://ab-content-bot-production.up.railway.app';
 
-// Service role: bypast RLS voor server-side queries
 const db = createClient(supabaseUrl, supabaseService || supabaseAnon);
 
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
 // ════════════════════════════════════════════════
+//  E-MAIL via Resend
+// ════════════════════════════════════════════════
+async function sendInviteEmail(toEmail, toName, inviterName, clientName, role, magicLink) {
+  const roleLabels = { admin: 'Admin', member: 'Member', viewer: 'Viewer' };
+  const roleLabel  = roleLabels[role] || role;
+
+  const html = `
+    <div style="font-family:sans-serif;max-width:480px;margin:0 auto;padding:32px 24px;">
+      <img src="https://ab-content-bot-production.up.railway.app/logo-email.png"
+           alt="Arthur &amp; Brent" style="height:36px;margin-bottom:24px;">
+      <h2 style="font-size:20px;font-weight:600;margin:0 0 8px;">
+        Je bent uitgenodigd voor ${clientName}
+      </h2>
+      <p style="color:#555;font-size:14px;line-height:1.6;margin:0 0 24px;">
+        ${inviterName} heeft je uitgenodigd om in te loggen op de
+        <strong>Arthur &amp; Brent AI Content Bot</strong> als <strong>${roleLabel}</strong>.
+      </p>
+      <a href="${magicLink}"
+         style="display:inline-block;background:#BBE3FA;color:#0A0A0A;
+                text-decoration:none;padding:12px 24px;border-radius:8px;
+                font-weight:600;font-size:14px;">
+        Inloggen →
+      </a>
+      <p style="color:#999;font-size:12px;margin-top:24px;line-height:1.5;">
+        Deze link is 7 dagen geldig. Werkt de knop niet?<br>
+        Kopieer deze URL: <span style="word-break:break-all;">${magicLink}</span>
+      </p>
+      <hr style="border:none;border-top:1px solid #eee;margin:24px 0;">
+      <p style="color:#bbb;font-size:11px;margin:0;">
+        Arthur &amp; Brent AI Content Bot — Alleen voor uitgenodigde gebruikers
+      </p>
+    </div>`;
+
+  const res = await fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${resendKey}`
+    },
+    body: JSON.stringify({
+      from:    'Arthur & Brent <no-reply@arthurbrent.nl>',
+      to:      [toEmail],
+      subject: `Uitnodiging: ${clientName} AI Content Bot`,
+      html
+    })
+  });
+
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.message || 'E-mail versturen mislukt');
+  }
+  return await res.json();
+}
+
+// ════════════════════════════════════════════════
 //  AUTH MIDDLEWARE
-//  Valideert Bearer token en hangt user+profile
-//  aan req.user / req.profile
 // ════════════════════════════════════════════════
 async function requireAuth(req, res, next) {
   const token = (req.headers.authorization || '').replace('Bearer ', '');
@@ -30,7 +83,7 @@ async function requireAuth(req, res, next) {
 
   const { data: profile } = await db
     .from('users')
-    .select('id, name, email, role, client_id')
+    .select('id, name, email, role, client_id, clients(id, name, initials, slug)')
     .eq('id', user.id)
     .single();
 
@@ -41,7 +94,6 @@ async function requireAuth(req, res, next) {
   next();
 }
 
-// Alleen owner mag bepaalde acties
 function requireOwner(req, res, next) {
   if (req.profile.role !== 'owner') {
     return res.status(403).json({ error: 'Alleen owners mogen dit doen' });
@@ -50,14 +102,14 @@ function requireOwner(req, res, next) {
 }
 
 // ════════════════════════════════════════════════
-//  CONFIG  (publiek — voor frontend Supabase init)
+//  CONFIG
 // ════════════════════════════════════════════════
 app.get('/api/config', (req, res) => {
   res.json({ supabaseUrl, supabaseAnon });
 });
 
 // ════════════════════════════════════════════════
-//  ME  (huidig gebruikersprofiel)
+//  ME
 // ════════════════════════════════════════════════
 app.get('/api/me', async (req, res) => {
   const token = (req.headers.authorization || '').replace('Bearer ', '');
@@ -82,8 +134,6 @@ app.get('/api/me', async (req, res) => {
 // ════════════════════════════════════════════════
 //  USERS
 // ════════════════════════════════════════════════
-
-// GET /api/users — alle gebruikers van de klant
 app.get('/api/users', requireAuth, async (req, res) => {
   const { data, error } = await db
     .from('users')
@@ -95,20 +145,17 @@ app.get('/api/users', requireAuth, async (req, res) => {
   res.json({ users: data });
 });
 
-// PUT /api/users/:id — rol wijzigen (owner only)
 app.put('/api/users/:id', requireAuth, requireOwner, async (req, res) => {
   const { role } = req.body;
-  const validRoles = ['admin', 'member', 'viewer'];
-  if (!validRoles.includes(role)) {
+  if (!['admin','member','viewer'].includes(role)) {
     return res.status(400).json({ error: 'Ongeldige rol' });
   }
-
   const { data, error } = await db
     .from('users')
     .update({ role })
     .eq('id', req.params.id)
-    .eq('client_id', req.profile.client_id) // mag alleen eigen klant
-    .neq('role', 'owner')                   // owner mag niet gewijzigd worden
+    .eq('client_id', req.profile.client_id)
+    .neq('role', 'owner')
     .select()
     .single();
 
@@ -116,12 +163,10 @@ app.put('/api/users/:id', requireAuth, requireOwner, async (req, res) => {
   res.json({ user: data });
 });
 
-// DELETE /api/users/:id — gebruiker verwijderen (owner only)
 app.delete('/api/users/:id', requireAuth, requireOwner, async (req, res) => {
   if (req.params.id === req.profile.id) {
     return res.status(400).json({ error: 'Je kunt jezelf niet verwijderen' });
   }
-
   const { error } = await db
     .from('users')
     .delete()
@@ -136,8 +181,6 @@ app.delete('/api/users/:id', requireAuth, requireOwner, async (req, res) => {
 // ════════════════════════════════════════════════
 //  INVITATIONS
 // ════════════════════════════════════════════════
-
-// GET /api/invitations — openstaande uitnodigingen
 app.get('/api/invitations', requireAuth, async (req, res) => {
   const { data, error } = await db
     .from('invitations')
@@ -151,13 +194,12 @@ app.get('/api/invitations', requireAuth, async (req, res) => {
   res.json({ invitations: data });
 });
 
-// POST /api/invitations — uitnodiging versturen (owner only)
 app.post('/api/invitations', requireAuth, requireOwner, async (req, res) => {
   const { email, role } = req.body;
-  const validRoles = ['admin', 'member', 'viewer'];
-
   if (!email) return res.status(400).json({ error: 'E-mailadres vereist' });
-  if (!validRoles.includes(role)) return res.status(400).json({ error: 'Ongeldige rol' });
+  if (!['admin','member','viewer'].includes(role)) {
+    return res.status(400).json({ error: 'Ongeldige rol' });
+  }
 
   // Controleer of gebruiker al bestaat
   const { data: existing } = await db
@@ -166,39 +208,47 @@ app.post('/api/invitations', requireAuth, requireOwner, async (req, res) => {
     .eq('email', email)
     .eq('client_id', req.profile.client_id)
     .single();
-
   if (existing) return res.status(400).json({ error: 'Dit e-mailadres is al actief als gebruiker' });
 
-  // Sla uitnodiging op in database
+  // Sla uitnodiging op in database EERST
   const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
   const { data: invitation, error: invError } = await db
     .from('invitations')
-    .insert({
-      client_id:  req.profile.client_id,
-      email,
-      role,
-      expires_at: expiresAt
-    })
+    .insert({ client_id: req.profile.client_id, email, role, expires_at: expiresAt })
     .select()
     .single();
-
   if (invError) return res.status(500).json({ error: invError.message });
 
-  // Stuur magic link via Supabase Auth
-  const { error: authError } = await db.auth.admin.inviteUserByEmail(email, {
-    redirectTo: `${process.env.APP_URL || 'https://ab-content-bot-production.up.railway.app'}`
+  // Genereer magic link via Supabase
+  const { data: linkData, error: linkError } = await db.auth.admin.generateLink({
+    type: 'magiclink',
+    email,
+    options: { redirectTo: appUrl }
   });
 
-  if (authError) {
-    // Auth fout — verwijder de uitnodiging weer
+  if (linkError) {
     await db.from('invitations').delete().eq('id', invitation.id);
-    return res.status(500).json({ error: authError.message });
+    return res.status(500).json({ error: linkError.message });
+  }
+
+  // Stuur e-mail via Resend
+  try {
+    await sendInviteEmail(
+      email,
+      email.split('@')[0],
+      req.profile.name,
+      req.profile.clients.name,
+      role,
+      linkData.properties.action_link
+    );
+  } catch (emailErr) {
+    await db.from('invitations').delete().eq('id', invitation.id);
+    return res.status(500).json({ error: emailErr.message });
   }
 
   res.json({ invitation });
 });
 
-// DELETE /api/invitations/:id — uitnodiging intrekken (owner only)
 app.delete('/api/invitations/:id', requireAuth, requireOwner, async (req, res) => {
   const { error } = await db
     .from('invitations')
@@ -210,26 +260,40 @@ app.delete('/api/invitations/:id', requireAuth, requireOwner, async (req, res) =
   res.json({ success: true });
 });
 
-// POST /api/invitations/:id/resend — uitnodiging opnieuw sturen (owner only)
 app.post('/api/invitations/:id/resend', requireAuth, requireOwner, async (req, res) => {
   const { data: inv } = await db
     .from('invitations')
-    .select('email')
+    .select('email, role')
     .eq('id', req.params.id)
     .eq('client_id', req.profile.client_id)
     .single();
-
   if (!inv) return res.status(404).json({ error: 'Uitnodiging niet gevonden' });
 
-  // Verlenging: zet expires_at 7 dagen vooruit
+  // Verleng de uitnodiging
   const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
   await db.from('invitations').update({ expires_at: expiresAt }).eq('id', req.params.id);
 
-  const { error } = await db.auth.admin.inviteUserByEmail(inv.email, {
-    redirectTo: `${process.env.APP_URL || 'https://ab-content-bot-production.up.railway.app'}`
+  // Nieuwe magic link genereren
+  const { data: linkData, error: linkError } = await db.auth.admin.generateLink({
+    type: 'magiclink',
+    email: inv.email,
+    options: { redirectTo: appUrl }
   });
+  if (linkError) return res.status(500).json({ error: linkError.message });
 
-  if (error) return res.status(500).json({ error: error.message });
+  try {
+    await sendInviteEmail(
+      inv.email,
+      inv.email.split('@')[0],
+      req.profile.name,
+      req.profile.clients.name,
+      inv.role,
+      linkData.properties.action_link
+    );
+  } catch (emailErr) {
+    return res.status(500).json({ error: emailErr.message });
+  }
+
   res.json({ success: true });
 });
 
