@@ -467,14 +467,14 @@ tr:hover td{background:var(--off);}
       Instellingen
     </div>
   </nav>
-  <div class="sb-foot" style="padding:0;">
-    <div onclick="openAccount()" title="Accountinstellingen" style="padding:10px 14px;display:flex;align-items:center;gap:10px;border-top:1px solid rgba(255,255,255,.07);cursor:pointer;transition:background .12s;" onmouseover="this.style.background='rgba(255,255,255,.04)'" onmouseout="this.style.background='transparent'">
-      <div class="av av-b" id="sb-av" style="width:30px;height:30px;font-size:11px;flex-shrink:0;">?</div>
+  <div class="sb-foot" style="padding:0;margin:0;">
+    <div onclick="openAccount()" title="Accountinstellingen" style="width:100%;box-sizing:border-box;padding:12px 16px;display:flex;align-items:center;gap:10px;border-top:1px solid rgba(255,255,255,.07);cursor:pointer;transition:background .12s;" onmouseover="this.style.background='rgba(255,255,255,.06)'" onmouseout="this.style.background='transparent'">
+      <div class="av av-b" id="sb-av" style="width:32px;height:32px;font-size:12px;flex-shrink:0;">?</div>
       <div style="flex:1;min-width:0;">
-        <div id="sb-name" style="font-size:12px;font-weight:500;color:rgba(255,255,255,.75);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Laden...</div>
-        <div id="sb-role" style="font-size:10px;color:rgba(255,255,255,.3);text-transform:capitalize;">—</div>
+        <div id="sb-name" style="font-size:12px;font-weight:500;color:rgba(255,255,255,.8);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Laden...</div>
+        <div id="sb-role" style="font-size:10px;color:rgba(255,255,255,.3);text-transform:capitalize;margin-top:1px;">—</div>
       </div>
-      <svg viewBox="0 0 24 24" style="width:13px;height:13px;stroke:rgba(255,255,255,.25);stroke-width:2;fill:none;flex-shrink:0;"><polyline points="9 18 15 12 9 6"/></svg>
+      <svg viewBox="0 0 24 24" style="width:12px;height:12px;stroke:rgba(255,255,255,.2);stroke-width:2;fill:none;flex-shrink:0;"><polyline points="9 18 15 12 9 6"/></svg>
     </div>
   </div>
 </aside>
@@ -1941,7 +1941,12 @@ function applyProfile(profile) {
   if (sbAv)   sbAv.textContent   = userIni(profile.name);
   if (sbName) sbName.textContent = profile.name;
   if (sbRole) sbRole.textContent = profile.role;
-  if (sbAv)   sbAv.className     = 'av ' + userAv(profile.role);
+  // Gebruik opgeslagen kleurvoorkeur, val terug op rol-kleur
+  var avColor = profile.avatar_color || userAv(profile.role);
+  if (sbAv) {
+    sbAv.className = 'av ' + avColor;
+    sbAv.style.cssText = 'width:32px;height:32px;font-size:12px;flex-shrink:0;';
+  }
 
   // Controleer of naam nog een e-mailadres is (eerste login)
   var nameIsEmail = profile.name && profile.name.indexOf('@') !== -1;
@@ -2070,11 +2075,24 @@ function saveAccount() {
   }
   apiCall('PUT', '/api/me/profile', { name: name, avatar_color: _selectedColor })
     .then(function() {
+      // Direct sidebar bijwerken zonder volledige herlaad
+      var sbAv   = document.getElementById('sb-av');
+      var sbName = document.getElementById('sb-name');
+      if (sbAv) {
+        sbAv.textContent = userIni(name);
+        sbAv.className = 'av ' + _selectedColor;
+        sbAv.style.cssText = 'width:32px;height:32px;font-size:12px;flex-shrink:0;';
+      }
+      if (sbName) sbName.textContent = name;
+      // Profiel cache bijwerken
+      if (_currentProfile) {
+        _currentProfile.name = name;
+        _currentProfile.avatar_color = _selectedColor;
+      }
       closeAccount();
-      _supabase.auth.getSession().then(function(r) {
-        if (r.data.session) loadProfile(r.data.session.access_token);
-      });
       toast('Profiel bijgewerkt.', 't-ok');
+      // Ook gebruikerstabel verversen
+      loadUsers();
     })
     .catch(function(e) {
       if (err) { err.textContent = e.message || 'Opslaan mislukt.'; err.style.display = 'block'; }
