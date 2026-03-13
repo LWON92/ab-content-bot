@@ -5,10 +5,13 @@ const { createClient } = require('@supabase/supabase-js');
 const app  = express();
 const PORT = process.env.PORT || 3000;
 
-// ── Supabase admin client (service role voor server-side checks) ──
-const supabaseUrl    = process.env.SUPABASE_URL;
-const supabaseAnon   = process.env.SUPABASE_ANON_KEY;
-const supabaseServer = createClient(supabaseUrl, supabaseAnon);
+// ── Supabase clients ──
+const supabaseUrl     = process.env.SUPABASE_URL;
+const supabaseAnon    = process.env.SUPABASE_ANON_KEY;
+const supabaseService = process.env.SUPABASE_SERVICE_KEY;
+
+// Service role client: bypast RLS voor server-side queries
+const supabaseServer  = createClient(supabaseUrl, supabaseService || supabaseAnon);
 
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
