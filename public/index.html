@@ -904,7 +904,13 @@ tr:hover td{background:var(--off);}
                 Productcategorie
                 <span id="wh-status-productcategorie" class="ast st-off" style="margin-left:8px;font-weight:400;">Niet ingesteld</span>
               </label>
-              <input type="url" id="wh-productcategorie" placeholder="https://your-n8n.com/webhook/productcategorie">
+              <div style="display:flex;gap:8px;align-items:center;">
+                <input type="url" id="wh-productcategorie" placeholder="https://your-n8n.com/webhook/productcategorie" style="flex:1;">
+                <button class="btn b-se superadmin-only" id="wh-test-productcategorie" onclick="testWH('productcategorie')" style="white-space:nowrap;flex-shrink:0;">
+                  <svg viewBox="0 0 24 24" style="width:13px;height:13px;stroke:currentColor;stroke-width:2;fill:none;"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>Test
+                </button>
+              </div>
+              <div id="wh-test-result-productcategorie" style="display:none;margin-top:6px;font-size:12px;padding:6px 10px;border-radius:6px;"></div>
             </div>
             <div class="fg full">
               <label class="lbl">
@@ -912,7 +918,13 @@ tr:hover td{background:var(--off);}
                 Meta Checker
                 <span id="wh-status-meta-checker" class="ast st-off" style="margin-left:8px;font-weight:400;">Niet ingesteld</span>
               </label>
-              <input type="url" id="wh-meta-checker" placeholder="https://your-n8n.com/webhook/meta-checker">
+              <div style="display:flex;gap:8px;align-items:center;">
+                <input type="url" id="wh-meta-checker" placeholder="https://your-n8n.com/webhook/meta-checker" style="flex:1;">
+                <button class="btn b-se superadmin-only" id="wh-test-meta-checker" onclick="testWH('meta-checker')" style="white-space:nowrap;flex-shrink:0;">
+                  <svg viewBox="0 0 24 24" style="width:13px;height:13px;stroke:currentColor;stroke-width:2;fill:none;"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>Test
+                </button>
+              </div>
+              <div id="wh-test-result-meta-checker" style="display:none;margin-top:6px;font-size:12px;padding:6px 10px;border-radius:6px;"></div>
             </div>
             <div class="fg full">
               <label class="lbl">
@@ -920,7 +932,13 @@ tr:hover td{background:var(--off);}
                 Meta Writer
                 <span id="wh-status-meta-writer" class="ast st-off" style="margin-left:8px;font-weight:400;">Niet ingesteld</span>
               </label>
-              <input type="url" id="wh-meta-writer" placeholder="https://your-n8n.com/webhook/meta-writer">
+              <div style="display:flex;gap:8px;align-items:center;">
+                <input type="url" id="wh-meta-writer" placeholder="https://your-n8n.com/webhook/meta-writer" style="flex:1;">
+                <button class="btn b-se superadmin-only" id="wh-test-meta-writer" onclick="testWH('meta-writer')" style="white-space:nowrap;flex-shrink:0;">
+                  <svg viewBox="0 0 24 24" style="width:13px;height:13px;stroke:currentColor;stroke-width:2;fill:none;"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>Test
+                </button>
+              </div>
+              <div id="wh-test-result-meta-writer" style="display:none;margin-top:6px;font-size:12px;padding:6px 10px;border-radius:6px;"></div>
             </div>
           </div>
           <button class="btn b-k" id="wh-save-btn" onclick="sWH()">
@@ -2026,10 +2044,68 @@ function sWH(){
   });
 }
 
+function testWH(type){
+  var inp=document.getElementById('wh-'+type);
+  var btn=document.getElementById('wh-test-'+type);
+  var res=document.getElementById('wh-test-result-'+type);
+  var url=inp?inp.value.trim():'';
 
-// ════════════════════════════════════════════════
-//  API HELPER
-// ════════════════════════════════════════════════
+  if(!url){
+    toast('Vul eerst een webhook URL in voor '+type+'.','t-err');
+    return;
+  }
+
+  if(btn){ btn.disabled=true; btn.textContent='Testen...'; }
+  if(res){ res.style.display='none'; }
+
+  var labels={'productcategorie':'Productcategorie','meta-checker':'Meta Checker','meta-writer':'Meta Writer'};
+
+  fetch(url,{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({
+      test:true,
+      type:type,
+      source:'AB Content Bot — Webhook Test',
+      label:labels[type]||type,
+      client_id:_activeClientId,
+      ts:new Date().toISOString()
+    })
+  })
+  .then(function(r){
+    if(btn){
+      btn.disabled=false;
+      btn.innerHTML='<svg viewBox="0 0 24 24" style="width:13px;height:13px;stroke:currentColor;stroke-width:2;fill:none;"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>Test';
+    }
+    if(res){
+      res.style.display='block';
+      if(r.ok){
+        res.style.background='rgba(77,184,138,0.12)';
+        res.style.color='#4DB88A';
+        res.style.border='1px solid rgba(77,184,138,0.3)';
+        res.textContent='\u2713 Verbinding geslaagd (HTTP '+r.status+') \u2014 n8n heeft het verzoek ontvangen.';
+      } else {
+        res.style.background='rgba(212,100,100,0.12)';
+        res.style.color='#D46A6A';
+        res.style.border='1px solid rgba(212,100,100,0.3)';
+        res.textContent='\u2717 Webhook reageerde met HTTP '+r.status+'. Controleer de URL in n8n.';
+      }
+    }
+  })
+  .catch(function(){
+    if(btn){
+      btn.disabled=false;
+      btn.innerHTML='<svg viewBox="0 0 24 24" style="width:13px;height:13px;stroke:currentColor;stroke-width:2;fill:none;"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>Test';
+    }
+    if(res){
+      res.style.display='block';
+      res.style.background='rgba(212,100,100,0.12)';
+      res.style.color='#D46A6A';
+      res.style.border='1px solid rgba(212,100,100,0.3)';
+      res.textContent='\u2717 Kon de webhook niet bereiken. Controleer de URL of of n8n actief is.';
+    }
+  });
+}
 function apiCall(method,url,body){
   return _supabase.auth.getSession().then(function(result){
     var token=result.data.session?result.data.session.access_token:'';
