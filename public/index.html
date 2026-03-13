@@ -737,11 +737,12 @@ tr:hover td{background:var(--off);}
         <div class="role-card"><div style="margin-bottom:5px;"><span class="role r-vw">Viewer</span></div><p>Alleen lezen. Kan geen aanvragen aanmaken of bot starten.</p></div>
       </div>
       <div class="tw"><table><thead><tr><th>Gebruiker</th><th>Rol</th><th>Toegevoegd</th><th>Laatste login</th><th>Status</th><th></th></tr></thead><tbody id="utbody"></tbody></table></div>
-      <div class="sh" style="margin-top:20px;"><div class="stt">Openstaande uitnodigingen <span class="scnt">2</span></div></div>
-      <div class="tw"><table><thead><tr><th>E-mailadres</th><th>Rol</th><th>Uitgenodigd</th><th>Verloopt</th><th></th></tr></thead><tbody>
-        <tr><td>sarah.de.vries@bosta.nl</td><td><span class="role r-mem">Member</span></td><td class="mono">8 mrt 2026</td><td class="mono">15 mrt 2026</td><td><div class="brow"><button class="btn b-gh bsm">Opnieuw</button><button class="btn b-dn bsm"><svg viewBox="0 0 24 24" style="width:12px;height:12px;stroke:currentColor;stroke-width:2;fill:none;"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div></td></tr>
-        <tr><td>m.janssen@bosta.nl</td><td><span class="role r-vw">Viewer</span></td><td class="mono">10 mrt 2026</td><td class="mono">17 mrt 2026</td><td><div class="brow"><button class="btn b-gh bsm">Opnieuw</button><button class="btn b-dn bsm"><svg viewBox="0 0 24 24" style="width:12px;height:12px;stroke:currentColor;stroke-width:2;fill:none;"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div></td></tr>
-      </tbody></table></div>
+      <div class="sh" style="margin-top:20px;">
+        <div class="stt">Openstaande uitnodigingen <span class="scnt" id="inv-cnt">0</span></div>
+      </div>
+      <div id="inv-tbl">
+        <div class="empty"><h3>Geen openstaande uitnodigingen</h3><p>Nodig een gebruiker uit via de knop hierboven.</p></div>
+      </div>
     </div>
 
     <!-- INSTELLINGEN -->
@@ -846,12 +847,7 @@ var wl=[],cd=[],br=[];
 var wh={seo:'',meta:''};
 var cdf='all';
 
-var users=[
-  {name:'Lars Wonnink',email:'lars@arthurbrent.nl',role:'owner',ini:'LW',av:'av-b',added:'1 jan 2026',login:'Vandaag',active:true},
-  {name:'Alex de Boer',email:'alex@bosta.nl',role:'admin',ini:'AB',av:'av-g',added:'15 jan 2026',login:'Gisteren',active:true},
-  {name:'Emma Jansen',email:'emma@bosta.nl',role:'member',ini:'EJ',av:'av-a',added:'1 feb 2026',login:'5 mrt 2026',active:true},
-  {name:'Tom Bakker',email:'tom@bosta.nl',role:'viewer',ini:'TB',av:'av-gr',added:'1 mrt 2026',login:'Nooit',active:false}
-];
+var users=[]; // wordt gevuld via API
 
 var panelLabels={
   'dashboard':'Dashboard',
@@ -1540,21 +1536,132 @@ document.addEventListener('click',function(e){
 });
 
 // USERS
+function esc(s){var d=document.createElement('div');d.textContent=s||'';return d.innerHTML;}
+function userIni(name){
+  var parts=(name||'').trim().split(' ').filter(Boolean);
+  if(parts.length>=2) return (parts[0][0]+parts[parts.length-1][0]).toUpperCase();
+  return (name||'??').substring(0,2).toUpperCase();
+}
+function userAv(role){
+  return role==='owner'?'av-b':role==='admin'?'av-g':role==='member'?'av-a':'av-gr';
+}
+function fmtDate(iso){
+  if(!iso) return 'Nooit';
+  return new Date(iso).toLocaleDateString('nl-NL',{day:'numeric',month:'short',year:'numeric'});
+}
+function roleBadge(role){
+  var cls=role==='owner'?'b-k':role==='admin'?'b-bl':role==='member'?'b-gr':'b-gy';
+  return '<span class="badge '+cls+'">'+role+'</span>';
+}
+
 function rUsers(){
-  var tb=document.getElementById('utbl'); if(!tb) return;
+  var tb=document.getElementById('utbody'); if(!tb) return;
+  if(!users.length){
+    tb.innerHTML='<tr><td colspan="6" style="text-align:center;padding:32px;color:var(--muted);">Geen gebruikers gevonden</td></tr>';
+    return;
+  }
   tb.innerHTML=users.map(function(u){
+    var canEdit=u.role!=='owner' && _currentProfile && _currentProfile.role==='owner';
+    var actions='';
+    if(canEdit){
+      var opts=['admin','member','viewer'].map(function(r){
+        return '<option value="'+r+'"'+(u.role===r?' selected':'')+'>'+r+'</option>';
+      }).join('');
+      actions='<div class="brow">'
+        +'<select class="csel" style="width:90px;" data-uid="'+u.id+'">'+opts+'</select>'
+        +'<button class="btn b-dn bsm" data-del="'+u.id+'"><svg viewBox="0 0 24 24" style="width:12px;height:12px;stroke:currentColor;stroke-width:2;fill:none;"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>'
+        +'</div>';
+    }
     return '<tr>'
       +'<td><div style="display:flex;align-items:center;gap:10px;">'
-      +'<div class="av '+u.av+'">'+u.ini+'</div>'
-      +'<div><div style="font-weight:500;">'+u.name+'</div><div style="font-size:11px;color:var(--muted);">'+u.email+'</div></div>'
+      +'<div class="av '+userAv(u.role)+'">'+userIni(u.name)+'</div>'
+      +'<div><div style="font-weight:500;">'+esc(u.name)+'</div>'
+      +'<div style="font-size:11px;color:var(--muted);">'+esc(u.email)+'</div></div>'
       +'</div></td>'
-      +'<td><span class="badge '+(u.role==='owner'?'b-k':u.role==='admin'?'b-bl':u.role==='member'?'b-gr':'b-gy')+'">'+u.role+'</span></td>'
-      +'<td class="mono">'+u.added+'</td>'
-      +'<td class="mono">'+u.login+'</td>'
-      +'<td><span class="badge '+(u.active?'b-gr':'b-gy')+'">'+(u.active?'Actief':'Inactief')+'</span></td>'
-      +'<td>'+(u.role!=='owner'?'<button class="btn b-gh bsm">Bewerken</button>':'')+'</td>'
+      +'<td>'+roleBadge(u.role)+'</td>'
+      +'<td class="mono">'+fmtDate(u.added_at)+'</td>'
+      +'<td class="mono">'+fmtDate(u.last_login_at)+'</td>'
+      +'<td><span class="badge '+(u.is_active?'b-gr':'b-gy')+'">'+(u.is_active?'Actief':'Inactief')+'</span></td>'
+      +'<td>'+actions+'</td>'
       +'</tr>';
   }).join('');
+  document.querySelectorAll('select[data-uid]').forEach(function(sel){
+    sel.addEventListener('change',function(){ chRole(this.dataset.uid,this.value); });
+  });
+  document.querySelectorAll('button[data-del]').forEach(function(btn){
+    btn.addEventListener('click',function(){ delUser(this.dataset.del); });
+  });
+}
+
+function loadUsers(){
+  apiCall('GET','/api/users').then(function(d){
+    users=d.users||[];
+    rUsers();
+  }).catch(function(){ toast('Gebruikers laden mislukt.','t-err'); });
+}
+
+function chRole(uid,role){
+  apiCall('PUT','/api/users/'+uid,{role:role}).then(function(){
+    toast('Rol bijgewerkt naar '+role+'.','t-ok');
+    loadUsers();
+  }).catch(function(e){ toast(e.message||'Fout bij wijzigen rol.','t-err'); });
+}
+
+function delUser(uid){
+  if(!confirm('Gebruiker verwijderen? Dit kan niet ongedaan worden gemaakt.')) return;
+  apiCall('DELETE','/api/users/'+uid).then(function(){
+    toast('Gebruiker verwijderd.','t-ok');
+    loadUsers();
+  }).catch(function(e){ toast(e.message||'Fout bij verwijderen.','t-err'); });
+}
+
+function rInvitations(){
+  apiCall('GET','/api/invitations').then(function(d){
+    var invs=d.invitations||[];
+    var cnt=document.getElementById('inv-cnt');
+    var tbl=document.getElementById('inv-tbl');
+    if(cnt) cnt.textContent=invs.length;
+    if(!tbl) return;
+    if(!invs.length){
+      tbl.innerHTML='<div class="empty"><h3>Geen openstaande uitnodigingen</h3><p>Nodig een gebruiker uit via de knop hierboven.</p></div>';
+      return;
+    }
+    tbl.innerHTML='<table><thead><tr><th>E-mailadres</th><th>Rol</th><th>Uitgenodigd</th><th>Verloopt</th><th></th></tr></thead><tbody>'
+      +invs.map(function(inv){
+        return '<tr>'
+          +'<td>'+esc(inv.email)+'</td>'
+          +'<td>'+roleBadge(inv.role)+'</td>'
+          +'<td class="mono">'+fmtDate(inv.invited_at)+'</td>'
+          +'<td class="mono">'+fmtDate(inv.expires_at)+'</td>'
+          +'<td><div class="brow">'
+            +'<button class="btn b-gh bsm" data-resend="'+inv.id+'">Opnieuw</button>'
+            +'<button class="btn b-dn bsm" data-delinv="'+inv.id+'"><svg viewBox="0 0 24 24" style="width:12px;height:12px;stroke:currentColor;stroke-width:2;fill:none;"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>'
+          +'</div></td>'
+          +'</tr>';
+      }).join('')
+      +'</tbody></table>';
+    document.querySelectorAll('button[data-resend]').forEach(function(btn){
+      btn.addEventListener('click',function(){ resendInv(this.dataset.resend); });
+    });
+    document.querySelectorAll('button[data-delinv]').forEach(function(btn){
+      btn.addEventListener('click',function(){ delInv(this.dataset.delinv); });
+    });
+  }).catch(function(){ toast('Uitnodigingen laden mislukt.','t-err'); });
+}
+
+function resendInv(id){
+  apiCall('POST','/api/invitations/'+id+'/resend').then(function(){
+    toast('Uitnodiging opnieuw verstuurd.','t-ok');
+    rInvitations();
+  }).catch(function(e){ toast(e.message||'Fout bij opnieuw versturen.','t-err'); });
+}
+
+function delInv(id){
+  if(!confirm('Uitnodiging intrekken?')) return;
+  apiCall('DELETE','/api/invitations/'+id).then(function(){
+    toast('Uitnodiging ingetrokken.','t-ok');
+    rInvitations();
+  }).catch(function(e){ toast(e.message||'Fout bij intrekken.','t-err'); });
 }
 
 // USER MODAL
@@ -1562,9 +1669,15 @@ function openM(){var m=document.getElementById('movl');if(m)m.style.display='fle
 function closeM(){var m=document.getElementById('movl');if(m)m.style.display='none';}
 function sInvite(){
   var e=document.getElementById('inv-e');
+  var r=document.getElementById('inv-r');
   if(!e||!e.value.trim()){toast('Voer een e-mailadres in.','t-err');return;}
-  toast('Uitnodiging verstuurd naar '+e.value.trim(),'t-ok');
-  closeM(); e.value='';
+  var email=e.value.trim();
+  var role=r?r.value:'member';
+  apiCall('POST','/api/invitations',{email:email,role:role}).then(function(){
+    toast('Uitnodiging verstuurd naar '+email,'t-ok');
+    closeM(); e.value='';
+    rInvitations();
+  }).catch(function(err){ toast(err.message||'Fout bij versturen uitnodiging.','t-err'); });
 }
 
 // API KEYS & WEBHOOKS
@@ -1588,6 +1701,23 @@ function sWH(){
   toast('Webhook URLs opgeslagen.','t-ok');
 }
 
+
+// ════════════════════════════════════════════════
+//  API HELPER
+// ════════════════════════════════════════════════
+function apiCall(method,url,body){
+  return _supabase.auth.getSession().then(function(result){
+    var token=result.data.session?result.data.session.access_token:'';
+    var opts={method:method,headers:{'Content-Type':'application/json','Authorization':'Bearer '+token}};
+    if(body) opts.body=JSON.stringify(body);
+    return fetch(url,opts).then(function(r){
+      return r.json().then(function(data){
+        if(!r.ok) throw new Error(data.error||'API fout');
+        return data;
+      });
+    });
+  });
+}
 
 // ════════════════════════════════════════════════
 //  SUPABASE AUTH
@@ -1642,6 +1772,8 @@ function loadProfile(token) {
     _currentProfile = data.user;
     applyProfile(data.user);
     hideLoginScreen();
+    loadUsers();
+    rInvitations();
   })
   .catch(function(e){
     console.error('Profiel laden mislukt:', e);
