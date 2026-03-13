@@ -298,6 +298,25 @@ app.post('/api/invitations/:id/resend', requireAuth, requireOwner, async (req, r
 });
 
 // ════════════════════════════════════════════════
+//  ME — NAAM BIJWERKEN
+// ════════════════════════════════════════════════
+app.put('/api/me/name', requireAuth, async (req, res) => {
+  const { name } = req.body;
+  if (!name || name.trim().length < 2) {
+    return res.status(400).json({ error: 'Naam te kort' });
+  }
+  const { data, error } = await db
+    .from('users')
+    .update({ name: name.trim() })
+    .eq('id', req.profile.id)
+    .select()
+    .single();
+
+  if (error) return res.status(500).json({ error: error.message });
+  res.json({ user: data });
+});
+
+// ════════════════════════════════════════════════
 //  SPA CATCH-ALL
 // ════════════════════════════════════════════════
 app.get('*', (req, res) => {
@@ -307,3 +326,5 @@ app.get('*', (req, res) => {
 app.listen(PORT, () => {
   console.log(`Arthur & Brent AI Content Bot draait op poort ${PORT}`);
 });
+
+// PUT /api/me/name — naam bijwerken van ingelogde gebruiker
